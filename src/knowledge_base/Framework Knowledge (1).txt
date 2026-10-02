@@ -1,0 +1,132 @@
+# Framework Knowledge — AI-Assisted Playwright Automation Framework
+
+## Test Structure Rules
+- All tests MUST follow Page Object Model (POM) pattern
+- Locators live in: `src/pages/locators/<name>.locators.js`
+- Page objects live in: `src/pages/<name>.page.js`
+- Test specs live in subdirectories of `src/tests/`:
+  - Navigation/smoke specs → `src/tests/nav/<name>-automated.spec.js`
+  - Application/journey specs → `src/tests/application/<name>-automated.spec.js`
+- Never put raw selectors directly inside spec files — always use the page object
+- Never duplicate a selector string across files
+
+## File Naming Convention
+- Locator file: `workday-<area>.locators.js` (e.g. `workday-finance.locators.js`)
+- Page file: `workday-<area>.page.js` (e.g. `workday-finance.page.js`)
+- Spec file: `workday-<area>-automated.spec.js` or `workday-<area>-e2e.spec.js`
+- Spec subdirectory: `application/` for all Workday specs
+
+## Imports and Require Paths
+Use only the modules required by the individual spec. Do not add imports for optional fixtures, unused page objects, unused test data, or unrelated helpers.
+
+When writing specs in a test subdirectory, require paths are relative to that file. For example, from `src/tests/scorecard/`:
+```js
+const { test, expect } = require('@playwright/test');
+const ScorecardPage = require('../../page-objects/ScorecardPage');
+```
+
+Rules:
+- Import `test` and `expect` directly from `@playwright/test` unless a real, existing repository fixture is explicitly required and available.
+- Do not import `../../fixtures`; this repository does not require a custom fixture for standard Playwright tests.
+- Import a page object only when the test uses it.
+- Import a test-data module only when the test uses values from it.
+- Keep URLs, expected text, credentials, and other reusable test values in a data module or environment variables when they are shared or sensitive. Do not invent or hardcode credentials.
+- Do not import locator modules into specs when the page object already exposes the required behavior. Specs should use page-object methods for UI interaction.
+
+## Optional Test Data Module
+Use a test-data module only when a spec has shared, reusable, environment-specific, or sensitive values. Do not require a data module for every test by default.
+
+For a project that uses one, all shared assertion values and URLs should come from that module rather than being repeated in specs. Credentials must come from environment variables or a secure CI secret, never from source-controlled fallback values.
+```js
+const TD = require('../../data/<project>-test-data');
+// Import only the data module entries used by this spec.
+```
+Add new entries to the project data module only when the value is shared or belongs outside the spec.
+
+## Locator File Structure
+```js
+const locators = {
+  elementName: (page) => page.locator('selector').first(),
+};
+module.exports = locators;
+```
+
+## Page Object Structure
+```js
+const loc = require('./locators/<name>.locators');
+const URL = '<target-url>';
+
+class <Name>Page {
+  constructor(page) { this.page = page; }
+  async goto() { await this.page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60000 }); }
+  // Action methods return values or booleans
+  // Never assert inside page objects — assertions belong in specs
+}
+module.exports = <Name>Page;
+```
+
+## Spec File Structure
+```js
+const { test, expect } = require('@playwright/test');
+const PageObject = require('../../page-objects/<page-object>.js');
+// Add a data-module import only if this spec uses shared test data.
+
+// Tags:
+//   @smoke       — page load / status field visible checks; fast
+//   @regression  — full workflow tests (post, validate, report); run nightly and on Workday releases
+//   @e2e         — cross-system journey tests (Workday → downstream API/UI)
+//   @capital-one — scopes all Capital One Workday tests
+test.describe('[UI] CAPxxx: <Story Title>', { tag: ['@smoke', '@regression', '@capital-one'] }, () => {
+  // APPLICATION spec: gotoXxx() called per-test (each test has its own navigation)
+  test('[Cxxx] Test Case N: <description>', async ({ page }) => {
+    const pageObject = new PageObject(page);
+    await pageObject.goto();
+    // arrange, act, assert using only the imported page object and required data
+  });
+});
+```
+
+## Assertion Rules
+- Use `expect(locator).toBeVisible()` not `isVisible()` inside specs
+- Use `expect(page).toHaveURL(/pattern/)` for URL assertions
+- Use `expect(page).toHaveTitle(/pattern/)` for title assertions
+- Use `expect(locator).toHaveText('exact text')` for content assertions
+- Always catch async errors with try/catch and re-throw for clear failure messages
+
+## Reuse Before Creating
+- Check existing page objects and locators before creating new helpers
+- If a method already exists in a page object, call it — do not reimplement
+- Extend existing page objects rather than duplicating them
+
+## Self-Healing
+- The Healer Agent retries with regenerated selectors on failure
+- Write selectors in order of resilience: data-testid > role > text > CSS
+- Avoid positional selectors like `nth(0)` unless absolutely necessary
+
+## Playwright Config
+- Config file: `config/playwright.config.js`
+- `globalSetup`: `config/globalSetup.js` — logs into Workday once, saves `playwright/.auth/workday-storageState.json`
+- Default browser: Chromium (production) + `chromium-staging` (staging)
+- Run all tests: `npx playwright test --config=config/playwright.config.js`
+- Run smoke only: `npx playwright test --config=config/playwright.config.js --grep "@smoke"`
+- Run regression only: `npx playwright test --config=config/playwright.config.js --grep "@regression"`
+- Run against staging: `npx playwright test --project=chromium-staging --config=config/playwright.config.js`
+- Run single spec: `npx playwright test src/tests/application/workday-finance-regression.spec.js --config=config/playwright.config.js`
+- HTML report: written to `playwright-report/` (Playwright default); open with `npx playwright show-report`
+- Blob report: written to `test-results/blob-report/`; merge shards with `npx playwright merge-reports --reporter=html test-results/blob-report`
+- Videos and traces are recorded by default for CI debugging
+
+## Flaky Test Detection
+The logging reporter (`src/integrations/logging-reporter.js`) automatically detects flaky tests
+(tests that pass after ≥1 retry) and emits `[FLAKY]` log lines. Search after a run:
+```powershell
+Select-String "\[FLAKY\]" logs/combined.log
+```
+
+## Optional Custom Fixtures
+Use a custom fixture only if the repository contains the fixture module and the test genuinely needs its additional behavior. Otherwise use:
+```js
+const { test, expect } = require('@playwright/test');
+```
+
+Do not generate imports for missing modules such as `../../fixtures`. A test must be executable with the dependencies present in the repository and its package configuration.

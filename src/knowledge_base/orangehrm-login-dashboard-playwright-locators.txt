@@ -1,0 +1,203 @@
+OrangeHRM Login + Dashboard Playwright Locators
+Observed and verified against the live demo on 2026-09-17.
+Base URL: https://opensource-demo.orangehrmlive.com
+
+LOGIN PAGE
+URL
+- https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+
+Recommended locators
+- Login heading
+  page.getByRole('heading', { name: 'Login' })
+
+- Username input
+  page.locator('input[name="username"]')
+
+- Password input
+  page.locator('input[name="password"]')
+
+- Login button
+  page.locator('button[type="submit"]')
+  page.getByRole('button', { name: 'Login' })
+
+- Forgot password link-like text
+  page.locator('p.orangehrm-login-forgot-header')
+  page.getByText('Forgot your password?', { exact: true })
+
+- Demo username hint
+  page.getByText('Username : Admin', { exact: true })
+
+- Demo password hint block
+  page.locator('text=[REDACTED_GENERIC_PASSWORD_1]')
+
+Useful page assertions
+- await expect(page).toHaveURL(/\/auth\/login$/)
+- await expect(page.locator('input[name="username"]')).toBeVisible()
+- await expect(page.locator('input[name="password"]')).toBeVisible()
+- await expect(page.getByRole('button', { name: 'Login' })).toBeVisible()
+
+Login action example
+- await page.locator('input[name="username"]').fill('Admin')
+- await page.locator('input[name="password"]').fill(process.env.ORANGEHRM_PASSWORD || '')
+- await page.getByRole('button', { name: 'Login' }).click()
+
+DASHBOARD PAGE
+URL
+- https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index
+
+Top-level page locators
+- Dashboard heading
+  page.locator('h6.oxd-topbar-header-breadcrumb-module')
+  page.getByRole('heading', { name: 'Dashboard' })
+
+- Left nav search
+  page.locator('aside input[placeholder="Search"]')
+
+- Upgrade button
+  page.locator('button.orangehrm-upgrade-button')
+  page.getByRole('button', { name: 'Upgrade' })
+
+- User dropdown trigger
+  page.locator('.oxd-userdropdown-tab')
+
+- Active dashboard nav link
+  page.locator('aside a[href="/web/index.php/dashboard/index"]')
+
+Left navigation locators
+- Admin
+  page.locator('aside a[href="/web/index.php/admin/viewAdminModule"]')
+
+- PIM
+  page.locator('aside a[href="/web/index.php/pim/viewPimModule"]')
+
+- Leave
+  page.locator('aside a[href="/web/index.php/leave/viewLeaveModule"]')
+
+- Time
+  page.locator('aside a[href="/web/index.php/time/viewTimeModule"]')
+
+- Recruitment
+  page.locator('aside a[href="/web/index.php/recruitment/viewRecruitmentModule"]')
+
+- My Info
+  page.locator('aside a[href="/web/index.php/pim/viewMyDetails"]')
+
+- Performance
+  page.locator('aside a[href="/web/index.php/performance/viewPerformanceModule"]')
+
+- Directory
+  page.locator('aside a[href="/web/index.php/directory/viewDirectory"]')
+
+- Maintenance
+  page.locator('aside a[href="/web/index.php/maintenance/viewMaintenanceModule"]')
+
+- Claim
+  page.locator('aside a[href="/web/index.php/claim/viewClaimModule"]')
+
+- Buzz
+  page.locator('aside a[href="/web/index.php/buzz/viewBuzz"]')
+
+Widget container locators
+- Time at Work card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Time at Work', { exact: true }) }).first()
+
+- My Actions card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('My Actions', { exact: true }) }).first()
+
+- Quick Launch card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Quick Launch', { exact: true }) }).first()
+
+- Buzz Latest Posts card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Buzz Latest Posts', { exact: true }) }).first()
+
+- Employees on Leave Today card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Employees on Leave Today', { exact: true }) }).first()
+
+- Employee Distribution by Sub Unit card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Employee Distribution by Sub Unit', { exact: true }) }).first()
+
+- Employee Distribution by Location card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Employee Distribution by Location', { exact: true }) }).first()
+
+Quick Launch locators
+- Assign Leave
+  page.locator('button[title="Assign Leave"]')
+
+- Leave List
+  page.locator('button[title="Leave List"]')
+
+- Timesheets
+  page.locator('button[title="Timesheets"]')
+
+- Apply Leave
+  page.locator('button[title="Apply Leave"]')
+
+- My Leave
+  page.locator('button[title="My Leave"]')
+
+- My Timesheet
+  page.locator('button[title="My Timesheet"]')
+
+Time at Work locators
+- Attendance state
+  page.locator('.orangehrm-attendance-card-state')
+
+- Attendance details
+  page.locator('.orangehrm-attendance-card-details')
+
+- Attendance action button
+  page.locator('button.orangehrm-attendance-card-action')
+
+- This week summary block
+  page.locator('.orangehrm-attendance-card-summary')
+
+My Actions locators
+- Pending Self Review item
+  page.getByText(/Pending Self Review$/)
+
+- Candidate to Interview item
+  page.getByText(/Candidate to Interview$/)
+
+- Action icon buttons
+  page.locator('.orangehrm-todo-list-item button.orangehrm-report-icon')
+
+Buzz locators
+- Buzz feed card body
+  page.locator('.orangehrm-buzz-widget')
+  Note: if this class is absent in your run, anchor from the widget title instead:
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Buzz Latest Posts', { exact: true }) }).first()
+
+Employees on Leave locators
+- Leave card container
+  page.locator('.emp-leave-chart')
+
+- Employee rows
+  page.locator('.orangehrm-leave-card-item, .orangehrm-leave-card-profile').first()
+  Note: row internals are more dynamic, so anchor on the card title for stability.
+
+Employee Distribution locators
+- Sub unit chart card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Employee Distribution by Sub Unit', { exact: true }) }).first()
+
+- Location chart card
+  page.locator('.orangehrm-dashboard-widget').filter({ has: page.getByText('Employee Distribution by Location', { exact: true }) }).first()
+
+- Chart legends
+  page.locator('.oxd-chart-legend')
+
+- Sub unit legend item by title
+  page.locator('.oxd-chart-legend .oxd-text--span[title="Engineering"]')
+  page.locator('.oxd-chart-legend .oxd-text--span[title="Human Resources"]')
+  page.locator('.oxd-chart-legend .oxd-text--span[title="Administration"]')
+  page.locator('.oxd-chart-legend .oxd-text--span[title="Client Services"]')
+  page.locator('.oxd-chart-legend .oxd-text--span[title="Unassigned"]')
+
+- Location legend item by title
+  page.locator('.oxd-chart-legend .oxd-text--span[title="Texas R&D"]')
+  page.locator('.oxd-chart-legend .oxd-text--span[title="New York Sales Office"]')
+  page.locator('.oxd-chart-legend .oxd-text--span[title="Unassigned"]')
+
+Recommended usage notes
+- Prefer name, href, title, and visible text before broad class chains.
+- For dashboard cards, use title-anchored container locators with .filter({ has: ... }).first() to avoid the duplicate outer and inner widget wrappers present in the DOM.
+- Keep the password outside source control. Use an environment variable such as ORANGEHRM_PASSWORD.

@@ -1,0 +1,343 @@
+# OrangeHRM Login-To-Dashboard App-Domain KB
+
+## Scope
+
+- Product: OrangeHRM Open Source demo
+- Login URL: `https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`
+- Dashboard URL: `https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index`
+- Entry page: Login
+- Destination page: Dashboard
+- Observation date: 2026-09-17
+- Version shown in footer: OrangeHRM OS 5.9
+- This knowledge base is intentionally limited to the login entry flow and the dashboard surface reached after authentication.
+
+## Login Entry Context
+
+- Login route: `/web/index.php/auth/login`
+- Dashboard route after successful authentication: `/web/index.php/dashboard/index`
+- username: `Admin`
+- Password: `admin123`
+
+Observed login-to-dashboard behavior:
+
+- the dashboard is an authenticated destination
+- unauthenticated users should start at the login page
+- successful authentication lands the user on the dashboard
+
+Credential handling note:
+
+- do not hard-code credentials in automation or committed artifacts
+- if this KB is reused for tests, source the password from a secure variable or local secret store instead of plain text
+
+## Access Flow
+
+1. User opens the login page.
+2. User enters the demo username `Admin` and Password `admin123`.
+3. Successful authentication redirects the session to the dashboard.
+4. The dashboard becomes the landing page for daily actions, status widgets, and cross-module shortcuts.
+
+## Dashboard Purpose
+
+The dashboard is the post-login landing page for a signed-in employee or administrator. It aggregates high-frequency HR tasks and status signals into one page so the user can:
+
+- check attendance status and time totals
+- review pending workflow items
+- jump into common leave and timesheet flows
+- see recent internal social posts
+- view current leave activity
+- understand employee distribution by organization and location
+
+## Dashboard Route Contract
+
+- Route path: `/web/index.php/dashboard/index`
+- Entry condition: authenticated session
+- Primary page heading: `Dashboard`
+- The page is framed by the global OrangeHRM shell: left side navigation, top bar, user menu, and footer.
+
+## Global Shell Visible On Dashboard
+
+### Left Side Navigation
+
+Visible modules from the dashboard session snapshot:
+
+- Admin
+- PIM
+- Leave
+- Time
+- Recruitment
+- My Info
+- Performance
+- Dashboard
+- Directory
+- Maintenance
+- Claim
+- Buzz
+
+Supporting shell behavior:
+
+- a sidepanel search textbox filters or locates modules
+- the dashboard module is selectable from the same navigation list as other application domains
+- the brand banner links to the OrangeHRM website
+
+### Top Bar
+
+- Page title: `Dashboard`
+- `Upgrade` call-to-action button links to OrangeHRM's upgrade page
+- profile avatar and dropdown affordance are present for account/session actions
+- a compact topbar menu button is present
+
+### Footer
+
+- product/version text: `OrangeHRM OS 5.9`
+- copyright block is shown
+
+## Dashboard Information Architecture
+
+The dashboard is composed of widget cards. The observed widgets are:
+
+1. Time at Work
+2. My Actions
+3. Quick Launch
+4. Buzz Latest Posts
+5. Employees on Leave Today
+6. Employee Distribution by Sub Unit
+7. Employee Distribution by Location
+
+These cards mix transactional shortcuts, work-queue indicators, activity feeds, and lightweight analytics.
+
+## Widget Knowledge
+
+### 1. Time at Work
+
+Purpose:
+
+- exposes the current attendance state for the signed-in user
+- summarizes today's worked time and the current week's total
+
+Observed fields:
+
+- status label such as `Punched In`
+- punch timestamp, for example `Punched In: Today at 06:26 AM (GMT 0)`
+- today's duration, for example `0h 20m Today`
+- current week label, for example `Sep 14 - Sep 20`
+- weekly total, for example `0h 0m`
+
+Observed actions:
+
+- an icon button appears next to the today's duration and next to the weekly summary area, indicating attendance or time-related interaction
+
+Domain interpretation:
+
+- backed by attendance/time-tracking data
+- state is user-specific and time-sensitive
+- expected to change after punch-in, punch-out, or timesheet events
+
+### 2. My Actions
+
+Purpose:
+
+- surfaces pending items that need the user's direct attention
+
+Observed items:
+
+- `(1) Pending Self Review`
+- `(1) Candidate to Interview`
+
+Observed behavior:
+
+- each item appears clickable
+- counts are embedded in the label and should be treated as dynamic workflow totals
+
+Domain interpretation:
+
+- this widget is a personalized task inbox spanning multiple modules such as performance and recruitment
+- items are conditional on role, assignments, and current workflow state
+
+### 3. Quick Launch
+
+Purpose:
+
+- provides one-click entry points into common HR tasks
+
+Observed shortcuts:
+
+- Assign Leave
+- Leave List
+- Timesheets
+- Apply Leave
+- My Leave
+- My Timesheet
+
+Domain interpretation:
+
+- shortcuts bridge directly into leave and time-management workflows
+- the set is action-oriented rather than analytics-oriented
+- these actions likely navigate to forms or filtered lists in the Leave and Time domains
+
+### 4. Buzz Latest Posts
+
+Purpose:
+
+- shows recent internal social or announcement posts from the Buzz module
+
+Observed post structure:
+
+- author name
+- post timestamp
+- post text content
+- optional media attachment/image
+
+Observed sample content patterns:
+
+- congratulatory announcement
+- long-form discussion post
+- short status/update post
+- post with image attachment
+
+Domain interpretation:
+
+- this is a recency-ordered feed preview
+- entries appear to link back to the author/post context
+- dashboard acts as a read-only teaser surface for deeper Buzz activity
+
+### 5. Employees on Leave Today
+
+Purpose:
+
+- highlights who is currently out on leave
+
+Observed row structure:
+
+- employee avatar
+- employee display name
+- leave descriptor such as region/type or leave category
+- employee identifier shown at the row end
+
+Observed examples:
+
+- `CAN - Matternity (Half Day - Morning)`
+- `US - Personal`
+
+Observed behavior:
+
+- an info or expand icon is present in the card header
+
+Domain interpretation:
+
+- this widget is organization-aware, date-bound, and likely filtered to the current day
+- useful for operational visibility and staffing awareness
+
+### 6. Employee Distribution by Sub Unit
+
+Purpose:
+
+- provides an organizational breakdown by department or sub unit
+
+Observed categories:
+
+- Engineering
+- Human Resources
+- Administration
+- Client Services
+- Unassigned
+
+Observed behavior:
+
+- each category is rendered as a clickable list item
+
+Domain interpretation:
+
+- represents aggregated employee counts by organizational hierarchy
+- `Unassigned` indicates data quality or onboarding gaps where a user lacks a mapped sub unit
+
+### 7. Employee Distribution by Location
+
+Purpose:
+
+- provides an organizational breakdown by location
+
+Observed categories:
+
+- Texas R&D
+- New York Sales Office
+- Unassigned
+
+Observed behavior:
+
+- each category is rendered as a clickable list item
+
+Domain interpretation:
+
+- represents aggregated employee counts by physical or business location
+- `Unassigned` indicates missing location mapping on employee records
+
+## Core Dashboard Domain Entities
+
+### Session And Identity
+
+- authenticated user
+- user role and permissions
+- profile avatar/account menu
+
+### Attendance And Time
+
+- punch status
+- punch timestamp
+- daily worked duration
+- weekly worked duration
+- week range
+
+### Workflow Queue Items
+
+- pending self review
+- candidate interview tasks
+- future action types dependent on role and enabled modules
+
+### Leave Domain Touchpoints
+
+- leave assignment
+- leave application
+- leave list
+- my leave
+- employees on leave today
+
+### Timesheet Domain Touchpoints
+
+- timesheets
+- my timesheet
+- week-based time summaries
+
+### Social Feed Domain
+
+- buzz post
+- author
+- timestamp
+- media attachment
+
+### Organization Analytics Domain
+
+- employee sub unit
+- employee location
+- unassigned classification
+
+## Behavioral Notes
+
+- The dashboard is heavily role-sensitive. Widget content and counts should be expected to vary by user permissions and assigned work.
+- Several widgets are data snapshots rather than primary record-management screens.
+- The page blends personal data, organization data, and navigation shortcuts in one layout.
+- Counts, timestamps, and feed content are dynamic and should not be treated as fixed fixtures.
+- `Unassigned` values are domain-significant because they expose incomplete master data.
+
+## Test And Automation Anchors
+
+Useful stable, human-visible anchors for dashboard automation or validation:
+
+- page heading: `Dashboard`
+- card titles: `Time at Work`, `My Actions`, `Quick Launch`, `Buzz Latest Posts`, `Employees on Leave Today`, `Employee Distribution by Sub Unit`, `Employee Distribution by Location`
+- quick launch labels: `Assign Leave`, `Leave List`, `Timesheets`, `Apply Leave`, `My Leave`, `My Timesheet`
+- shell labels: `Admin`, `PIM`, `Leave`, `Time`, `Recruitment`, `My Info`, `Performance`, `Dashboard`, `Directory`, `Maintenance`, `Claim`, `Buzz`
+
+## Boundaries
+
+- This KB does not describe the internal behavior of Admin, PIM, Leave, Time, Recruitment, Directory, Maintenance, Claim, or Buzz beyond what is directly exposed on the dashboard.
+- This KB is based on the demo instance's observed dashboard state and visible interactions, not backend schema or source code.
