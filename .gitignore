@@ -1,0 +1,21 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+.venv/
+venv/
+ENV/
+
+# Output artifacts
+outputs/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp

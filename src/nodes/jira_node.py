@@ -27,3 +27,55 @@ def fetch_jira_story(state: GraphState):
             jira_story_content = str(last_msg)
     
     return {"jira_story": jira_story_content}
+
+import os
+import requests
+import json
+from requests.auth import HTTPBasicAuth
+
+def create_subtask(state: GraphState):
+    print("--- Creating Jira Subtask for Generated Scenarios ---")
+    
+    parent_key = "QE-378"
+    project_key = parent_key.split("-")[0]
+    
+    scenarios = state.get("test_scenarios", {})
+    if isinstance(scenarios, dict):
+        description_text = json.dumps(scenarios.get("scenarios", scenarios), indent=2)
+    else:
+        description_text = str(scenarios)
+        
+    domain = os.getenv("JIRA_DOMAIN")
+    username = os.getenv("JIRA_USERNAME")
+    api_key = os.getenv("JIRA_API_KEY")
+    
+    if not domain or not username or not api_key:
+        print("Missing Jira credentials")
+        return {"testcases": {"error": "Missing Jira credentials"}}
+
+    url = f"{domain}/rest/api/2/issue"
+    auth = HTTPBasicAuth(username, api_key)
+    headers = {"Accept": "application/json", "Content-Type": "application/json"}
+    
+    payload = {
+        "fields": {
+            "project": {"key": project_key},
+            "parent": {"key": parent_key},
+            "summary": "Generated Test Scenarios for " + parent_key,
+            "description": description_text,
+            "issuetype": {"name": "Subtask"}
+        }
+    }
+    
+    try:
+        # verify=False is used in your get_issue_details as well, so keeping consistency
+        response = requests.post(url, headers=headers, auth=auth, json=payload, verify=False, timeout=10)
+        response.raise_for_status()
+        new_issue = response.json()
+        print(f"Successfully created subtask: {new_issue.get('key')}")
+    except Exception as e:
+        print(f"Failed to create subtask: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+             print(e.response.text)
+             
+    return {"testcases": state.get("testcases", {})}

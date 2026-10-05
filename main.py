@@ -2,6 +2,9 @@ from src.graph import result
 import os
 import json
 
+# from langchain_core.globals import set_debug
+# set_debug(True)
+
 initial_state={}
 final_response=result.invoke(initial_state)
 print("Graph execution complete.")

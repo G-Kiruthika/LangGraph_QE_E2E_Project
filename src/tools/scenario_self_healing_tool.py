@@ -7,6 +7,7 @@ from langchain_core.tools import BaseTool
 # Import our local agents
 from src.agents.scenario_generator_agent import scenario_generator_agent
 from src.agents.scenario_reviewer_agent import scenario_reviewer_agent
+from src.tools.rag_tools import orangehrmDomain_kb_tool
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,17 @@ class ScenarioSelfHealingGeneratorToolV1(BaseTool):
         preconditions = a.get("preconditions") or ""
         threshold = int(a.get("threshold", 85))
         max_regen = max(1, int(a.get("max_regen", 3)))
+        
+        # 0. Fetch KB context
+        try:
+            print("\n[DEBUG] TOOL IS SEARCHING KNOWLEDGE BASE DIRECTLY...")
+            kb_context = orangehrmDomain_kb_tool.invoke({"query": story_summary})
+            print(f"\n=================== RAG CONTEXT RETRIEVED ===================")
+            print(kb_context)
+            print(f"=============================================================\n")
+        except Exception as e:
+            logger.warning(f"Failed to fetch KB context: {e}")
+            kb_context = "No KB context available."
 
         feedback = ""
         best = None
@@ -69,6 +81,7 @@ class ScenarioSelfHealingGeneratorToolV1(BaseTool):
                 f"Description: {story_description}\n"
                 f"Epic: {epic_context}\n"
                 f"Preconditions: {preconditions}\n"
+                f"Knowledge Base Context:\n{kb_context}\n"
             )
             if feedback:
                 gen_payload_str += f"\nReviewer Feedback from last round: {feedback}. Please fix these issues exactly."
@@ -80,7 +93,28 @@ class ScenarioSelfHealingGeneratorToolV1(BaseTool):
                 
                 # We need it as a JSON string to pass it around
                 messages = gen_result.get("messages", [])
-                scenarios_json = messages[-1].content if messages else ""
+                if messages:
+                    raw_scenarios = messages[-1].content
+                    if isinstance(raw_scenarios, str):
+                        scenarios_json = raw_scenarios
+                    elif isinstance(raw_scenarios, list):
+                        parts = []
+                        for item in raw_scenarios:
+                            if isinstance(item, str):
+                                parts.append(item)
+                            elif isinstance(item, dict) and "text" in item:
+                                parts.append(item["text"])
+                            elif isinstance(item, dict):
+                                parts.append(json.dumps(item))
+                            else:
+                                parts.append(str(item))
+                        scenarios_json = "\n".join(parts)
+                    elif isinstance(raw_scenarios, dict):
+                        scenarios_json = json.dumps(raw_scenarios)
+                    else:
+                        scenarios_json = str(raw_scenarios)
+                else:
+                    scenarios_json = ""
             except Exception as e:
                 trajectory.append({"round": round_num, "error": f"generator failed: {str(e)}"})
                 break
