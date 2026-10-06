@@ -22,3 +22,17 @@ class Scenario(BaseModel):
 class ScenarioResponse(BaseModel):
     scenarios: List[Scenario]
     
+class TestStep(BaseModel):
+    action: str
+    data: str
+    expected_result: str
+
+class TestCase(BaseModel):
+    summary: str
+    description: str
+    test_type: str = Field(default="Functional", description="e.g. Functional, Non-functional, Negative, Integration")
+    scenario_id: str
+    steps: List[TestStep]
+
+class TestCaseResponse(BaseModel):
+    testcases: List[TestCase]

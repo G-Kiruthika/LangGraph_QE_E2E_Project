@@ -18,3 +18,9 @@ with open(output_path, "w") as f:
     json.dump(final_response, f, indent=4)
 
 print(f"Outputs written to {output_path}")
+
+testcases_output_path = os.path.join("outputs", "final_testcases.json")
+with open(testcases_output_path, "w") as f:
+    json.dump(final_response.get("testcases", {}), f, indent=4)
+    
+print(f"Testcases written to {testcases_output_path}")
