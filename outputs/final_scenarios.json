@@ -2,24 +2,95 @@
     "jira_story": [
         {
             "type": "text",
-            "text": "The Jira ticket **QE-378** is currently in the **To Do** status. Below are the details:\n\n*   **Issue Key:** QE-378\n*   **Summary:** Login and access dashboard in OrangeHRM\n*   **Description:** \n    As an OrangeHRM user, I want to log in with valid credentials and be redirected to the dashboard, so that I can quickly view my work status, pending actions, and access common HR functions.\n\n    **Acceptance Criteria:**\n    *   AC1: User is able to open the OrangeHRM login page.\n    *   AC2: Login page displays Username, Password, and Login button.\n    *   AC3: User is able to enter valid credentials and click Login.\n    *   AC4: On successful login, user is redirected to the Dashboard page.\n    *   AC5: Dashboard page displays the Dashboard heading.\n    *   AC6: Dashboard page displays key widgets including Time at Work, My Actions, and Quick Launch.\n    *   AC7: User can view dashboard information after login without errors.\n    *   AC8: User can use dashboard shortcuts to access common HR actions.\n\n    **Business Value:**\n    Provides a secure entry point and immediate access to important employee actions and information.\n\n    **Definition of Done:**\n    1. Login flow works with valid credentials.\n    2. Dashboard loads successfully after login.\n    3. Key dashboard widgets are visible.\n    4. Flow is validated through testing.\n\n*   **Status:** To Do",
+            "text": "The Jira ticket **QE-378** has been retrieved. Here are the details:\n\n*   **issue_key:** QE-378\n*   **summary:** Login and access dashboard in OrangeHRM\n*   **description:** \n    Description:\n    As an OrangeHRM user,\n    I want to log in with valid credentials and be redirected to the dashboard,\n    so that I can quickly view my work status, pending actions, and access common HR functions.\n\n    **Acceptance Criteria**\n    AC1: User is able to open the OrangeHRM login page.\n    Given the user is not logged in\n    When the user opens the OrangeHRM application\n    Then the login page should be displayed\n\n    AC2: Login page displays Username, Password, and Login button.\n    Given the user is on the OrangeHRM login page\n    When the page loads\n    Then the Username field, Password field, and Login button should be visible\n\n    AC3: User is able to enter valid credentials and click Login.\n    Given the user is on the OrangeHRM login page\n    When the user enters valid credentials and clicks the Login button\n    Then the login should be submitted successfully\n\n    AC4: On successful login, user is redirected to the Dashboard page.\n    Given the user has logged in successfully\n    When authentication is completed\n    Then the user should be redirected to the Dashboard page\n\n    AC5: Dashboard page displays the Dashboard heading.\n    Given the user is on the Dashboard page\n    When the page loads\n    Then the Dashboard heading should be visible\n\n    AC6: Dashboard page displays key widgets including Time at Work, My Actions, and Quick Launch.\n    Given the user is on the Dashboard page\n    When the page loads\n    Then the Time at Work, My Actions, and Quick Launch widgets should be visible\n\n    AC7: User can view dashboard information after login without errors.\n    Given the user is on the Dashboard page\n    When the page loads\n    Then the dashboard information should be displayed without errors\n\n    AC8: User can use dashboard shortcuts to access common HR actions.\n    Given the user is on the Dashboard page\n    When the user selects a dashboard shortcut\n    Then the corresponding HR action should open successfully\n\n    Business Value:\n    Provides a secure entry point and immediate access to important employee actions and information.\n\n    Definition of Done:\n    1. Login flow works with valid credentials.\n    2. Dashboard loads successfully after login.\n    3. Key dashboard widgets are visible.\n    4. Flow is validated through testing.\n\n*   **status:** To Do",
             "extras": {
-                "signature": "EnMKcQFpFH0TPIcF5mvCRzym4NcX81BV60/YebOw2xSJlHOO4BpnfkF777JaHgwXrtP+rod0drs5QeX9qYK0JtIFX4qMKXC84hP23qGx0VlNJUwzTiKG9WnfLCHnw/DwoGF3rMe0UDbje5GmpVf2HZQGi+z4"
+                "signature": "EnMKcQFpFH0TKJAbco6KChS1yN2lXZGWCyr5IiG8Rmts9IozwiCo7h4B9Ls1dkRBrrJ5h+sb2ilipnUVxeXG6bd3JvvJ8aAuHiGJdYlX+qZ9+5B0KVaTnbQQOJXgiTljmmrFY/il5onjL/Pp3QbXA0GotJNA"
             }
         }
     ],
     "test_scenarios": {
         "status": "ok",
-        "confidencescore": 95,
+        "confidencescore": 90,
         "threshold": 85,
         "rounds": 1,
         "healingtriggered": false,
-        "scenarios": "[[[NL]]  {[[NL]]    \"id\": \"TC01\",[[NL]]    \"title\": \"Verify Login Page UI Elements\",[[NL]]    \"description\": \"Verify that the login page displays the Username field, Password field, and Login button as per AC2.\",[[NL]]    \"type\": \"Positive\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC02\",[[NL]]    \"title\": \"Successful Login and Dashboard Redirection\",[[NL]]    \"description\": \"Verify that a user with valid credentials is redirected to the Dashboard page upon clicking the Login button.\",[[NL]]    \"type\": \"Positive\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC03\",[[NL]]    \"title\": \"Verify Dashboard Page Content\",[[NL]]    \"description\": \"Verify that the Dashboard page displays the 'Dashboard' heading and the required widgets (Time at Work, My Actions, Quick Launch).\",[[NL]]    \"type\": \"Positive\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC04\",[[NL]]    \"title\": \"Verify Dashboard Shortcut Functionality\",[[NL]]    \"description\": \"Verify that clicking on a shortcut within the Quick Launch widget successfully navigates the user to the corresponding HR function page.\",[[NL]]    \"type\": \"Positive\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC05\",[[NL]]    \"title\": \"Login with Invalid Credentials\",[[NL]]    \"description\": \"Verify that the system displays an appropriate error message when attempting to log in with an incorrect username or password.\",[[NL]]    \"type\": \"Negative\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC06\",[[NL]]    \"title\": \"Login with Empty Credentials\",[[NL]]    \"description\": \"Verify that the system prevents login and displays validation messages when both Username and Password fields are left blank.\",[[NL]]    \"type\": \"Negative\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC07\",[[NL]]    \"title\": \"Verify Dashboard Session Persistence\",[[NL]]    \"description\": \"Verify that the user remains on the Dashboard page after refreshing the browser while logged in.\",[[NL]]    \"type\": \"Edge\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC08\",[[NL]]    \"title\": \"Verify Unauthorized Access to Dashboard\",[[NL]]    \"description\": \"Verify that navigating directly to the Dashboard URL without an active session redirects the user back to the Login page.\",[[NL]]    \"type\": \"Negative\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC09\",[[NL]]    \"title\": \"Verify Password Masking\",[[NL]]    \"description\": \"Verify that characters entered in the Password field are masked (e.g., dots or asterisks) for security.\",[[NL]]    \"type\": \"Positive\"[[NL]]  },[[NL]]  {[[NL]]    \"id\": \"TC10\",[[NL]]    \"title\": \"Verify Dashboard Responsiveness\",[[NL]]    \"description\": \"Verify that the Dashboard widgets are visible and correctly aligned when accessing the page from different browser window sizes.\",[[NL]]    \"type\": \"Edge\"[[NL]]  }[[NL]]]",
-        "reviewerfeedback": "The test scenarios provide excellent coverage of the acceptance criteria, including critical negative and edge cases not explicitly mentioned in the ACs but necessary for a robust login/dashboard flow (e.g., session persistence, unauthorized access, and password masking). The scenarios are well-structured and distinct. The only minor improvement would be to ensure that TC04 (Quick Launch) is parameterized to cover multiple shortcuts rather than just one, but the current approach is sufficient for a high-level test suite.",
+        "scenarios": [
+            {
+                "test_scenario_id": "TS-01",
+                "test_scenario_description": "Verify successful navigation to the OrangeHRM login page",
+                "expected_results": "Login page is displayed with Username, Password, and Login button visible.",
+                "preconditions": "User is not logged in.",
+                "test_data": "URL: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+                "navigable_path": "Open browser and navigate to the provided login URL.",
+                "acceptance_criteria_id": "AC1, AC2",
+                "IssueId": "QE-378"
+            },
+            {
+                "test_scenario_id": "TS-02",
+                "test_scenario_description": "Verify successful login with valid credentials",
+                "expected_results": "User is redirected to the Dashboard page.",
+                "preconditions": "User is on the login page.",
+                "test_data": "Username: Admin, Password: admin123",
+                "navigable_path": "Enter valid credentials and click the Login button.",
+                "acceptance_criteria_id": "AC3, AC4",
+                "IssueId": "QE-378"
+            },
+            {
+                "test_scenario_id": "TS-03",
+                "test_scenario_description": "Verify Dashboard page elements and widgets visibility",
+                "expected_results": "Dashboard heading, Time at Work, My Actions, and Quick Launch widgets are visible.",
+                "preconditions": "User is logged in and on the Dashboard page.",
+                "test_data": "N/A",
+                "navigable_path": "Login and observe the Dashboard page.",
+                "acceptance_criteria_id": "AC5, AC6",
+                "IssueId": "QE-378"
+            },
+            {
+                "test_scenario_id": "TS-04",
+                "test_scenario_description": "Verify dashboard loads without errors",
+                "expected_results": "Dashboard content loads fully without console errors or broken UI components.",
+                "preconditions": "User is logged in.",
+                "test_data": "N/A",
+                "navigable_path": "Navigate to Dashboard.",
+                "acceptance_criteria_id": "AC7",
+                "IssueId": "QE-378"
+            },
+            {
+                "test_scenario_id": "TS-05",
+                "test_scenario_description": "Verify functionality of dashboard shortcuts",
+                "expected_results": "Selecting a shortcut redirects the user to the corresponding HR action page.",
+                "preconditions": "User is on the Dashboard page.",
+                "test_data": "Shortcut: 'Assign Leave' or 'Time Sheets'",
+                "navigable_path": "Click on a shortcut icon in the Quick Launch widget.",
+                "acceptance_criteria_id": "AC8",
+                "IssueId": "QE-378"
+            },
+            {
+                "test_scenario_id": "TS-06",
+                "test_scenario_description": "Verify login failure with invalid credentials",
+                "expected_results": "System displays an error message and does not redirect to the dashboard.",
+                "preconditions": "User is on the login page.",
+                "test_data": "Username: InvalidUser, Password: WrongPassword",
+                "navigable_path": "Enter invalid credentials and click Login.",
+                "acceptance_criteria_id": "AC3",
+                "IssueId": "QE-378"
+            },
+            {
+                "test_scenario_id": "TS-07",
+                "test_scenario_description": "Verify login failure with empty credentials",
+                "expected_results": "System displays validation messages for required fields.",
+                "preconditions": "User is on the login page.",
+                "test_data": "Username: empty, Password: empty",
+                "navigable_path": "Click Login without entering data.",
+                "acceptance_criteria_id": "AC3",
+                "IssueId": "QE-378"
+            }
+        ],
+        "reviewerfeedback": "The scenarios provide excellent coverage of the acceptance criteria and include necessary negative test cases (invalid/empty credentials) which were not explicitly listed in the AC but are essential for a robust login flow. The scenarios are well-structured and map clearly to the requirements. Strengths: Good inclusion of negative testing and clear mapping to ACs. Gaps: While the coverage is strong, the scenarios could be further optimized by parameterizing the login failure cases (TS-06 and TS-07) into a single 'Invalid Login' scenario to reduce redundancy. Additionally, consider adding a scenario for session persistence or logout to ensure the 'not logged in' precondition can be reliably met in an automated suite.",
         "trajectory": [
             {
                 "round": 1,
-                "confidence": 95,
+                "confidence": 90,
                 "decision": "STOP threshold-met"
             }
         ]

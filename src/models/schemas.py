@@ -12,8 +12,8 @@ class Scenario(BaseModel):
     """Schema for a test scenario"""
     test_scenario_id: str
     test_scenario_description: str
-    expected_results: List[str]
-    preconditions: List[str]
+    expected_results: str
+    preconditions: str
     test_data: str
     navigable_path: str
     acceptance_criteria_id: str

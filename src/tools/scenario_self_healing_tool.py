@@ -94,25 +94,31 @@ class ScenarioSelfHealingGeneratorToolV1(BaseTool):
                 # We need it as a JSON string to pass it around
                 messages = gen_result.get("messages", [])
                 if messages:
-                    raw_scenarios = messages[-1].content
-                    if isinstance(raw_scenarios, str):
-                        scenarios_json = raw_scenarios
-                    elif isinstance(raw_scenarios, list):
-                        parts = []
-                        for item in raw_scenarios:
-                            if isinstance(item, str):
-                                parts.append(item)
-                            elif isinstance(item, dict) and "text" in item:
-                                parts.append(item["text"])
-                            elif isinstance(item, dict):
-                                parts.append(json.dumps(item))
-                            else:
-                                parts.append(str(item))
-                        scenarios_json = "\n".join(parts)
-                    elif isinstance(raw_scenarios, dict):
-                        scenarios_json = json.dumps(raw_scenarios)
+                    last_msg = messages[-1]
+                    # Check if structured output is returned via tool_calls
+                    if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
+                        # Extract the arguments from the first tool call
+                        scenarios_json = json.dumps(last_msg.tool_calls[0].get("args", {}))
                     else:
-                        scenarios_json = str(raw_scenarios)
+                        raw_scenarios = last_msg.content
+                        if isinstance(raw_scenarios, str):
+                            scenarios_json = raw_scenarios
+                        elif isinstance(raw_scenarios, list):
+                            parts = []
+                            for item in raw_scenarios:
+                                if isinstance(item, str):
+                                    parts.append(item)
+                                elif isinstance(item, dict) and "text" in item:
+                                    parts.append(item["text"])
+                                elif isinstance(item, dict):
+                                    parts.append(json.dumps(item))
+                                else:
+                                    parts.append(str(item))
+                            scenarios_json = "\n".join(parts)
+                        elif isinstance(raw_scenarios, dict):
+                            scenarios_json = json.dumps(raw_scenarios)
+                        else:
+                            scenarios_json = str(raw_scenarios)
                 else:
                     scenarios_json = ""
             except Exception as e:
@@ -160,13 +166,21 @@ class ScenarioSelfHealingGeneratorToolV1(BaseTool):
         if best is None:
             return json.dumps({"status": "error", "error": "no successful round", "trajectory": trajectory})
 
+        try:
+            parsed_scenarios = json.loads(_strip_fences(best["scenarios"]))
+            # If the response wrapper 'scenarios' is present, we extract it.
+            if isinstance(parsed_scenarios, dict) and "scenarios" in parsed_scenarios:
+                parsed_scenarios = parsed_scenarios["scenarios"]
+        except Exception:
+            parsed_scenarios = best["scenarios"]
+
         return json.dumps({
             "status": "ok",
             "confidencescore": best["confidence"],
             "threshold": threshold,
             "rounds": best["round"],
             "healingtriggered": best["round"] > 1,
-            "scenarios": _flatten_multiline(best["scenarios"]),
+            "scenarios": parsed_scenarios,
             "reviewerfeedback": best["review"]["feedback"],
             "trajectory": trajectory
         })

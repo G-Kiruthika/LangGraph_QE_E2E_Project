@@ -13,6 +13,21 @@ Instructions:
 5. Your output must strictly follow the required JSON array format below. 
 6. Ensure all fields are present.  
 7. Limit the number of scenarios generated to a maximum of 10 only.   
+8. For the 'IssueId' field, you MUST extract and use the exact Jira issue key (e.g., QE-378) provided in the story description.
+
+Expected JSON Array format for scenarios:
+[
+  {
+    "test_scenario_id": "TS-01",
+    "test_scenario_description": "...",
+    "expected_results": "...",
+    "preconditions": "...",
+    "test_data": "...",
+    "navigable_path": "...",
+    "acceptance_criteria_id": "...",
+    "IssueId": [issue_id from jira story]
+  }
+]
 """
 
 from langgraph.prebuilt import create_react_agent
