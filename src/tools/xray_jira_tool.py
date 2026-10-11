@@ -71,27 +71,39 @@ class XrayJiraCompleteTraceabilityTool(BaseTool):
                 # ---------------------------------------------------------
                 raw_summary = test.get("summary", "Untitled Test")
                 raw_desc = test.get("description", "")
-                
-                # Format the steps into a markdown string to append to description
-                steps = test.get("steps", [])
-                steps_md = "\n\n**Test Steps:**\n"
-                if steps:
-                    steps_md += "| Step | Action | Data | Expected Result |\n|---|---|---|---|\n"
-                    for idx, step in enumerate(steps):
-                        action = step.get("action", "").replace("\n", " ")
-                        data = step.get("data", "").replace("\n", " ")
-                        expected_result = step.get("expected_result", "").replace("\n", " ")
-                        steps_md += f"| {idx+1} | {action} | {data} | {expected_result} |\n"
-                
-                test_desc = raw_desc + steps_md
-                
+                test_type = "Manual"  # Xray Cloud supports Manual, Cucumber, Generic
+
+                # Extract and format Steps for Xray GraphQL
+                raw_steps = test.get("steps", [])
+                formatted_steps = []
+                for step in raw_steps:
+                    action = step.get("action", "")
+                    data = step.get("data", "")
+                    result = step.get("expected_result", step.get("result", ""))
+
+                    if action or data or result:
+                        formatted_steps.append({
+                            "action": action,
+                            "data": data,
+                            "result": result
+                        })
+
+                # Fallback if no steps are present
+                if not formatted_steps:
+                    formatted_steps.append({
+                        "action": "Execute test according to description",
+                        "data": "",
+                        "result": "Expected behavior is observed"
+                    })
+
                 # ==========================================
-                # 1. CREATE TEST ISSUE (GraphQL)
+                # 1. CREATE TEST ISSUE (GraphQL with native Steps)
                 # ==========================================
                 test_mutation = """
-                mutation CreateTestIssue($projectKey: String!, $summary: String!, $desc: String!) {
+                mutation CreateTestIssue($projectKey: String!, $summary: String!, $desc: String!, $testType: String!, $steps: [CreateStepInput]!) {
                     createTest(
-                        testType: { name: "Manual" },
+                        testType: { name: $testType },
+                        steps: $steps,
                         jira: { fields: { project: { key: $projectKey }, summary: $summary, description: $desc } }
                     ) {
                         test { jira(fields: ["key", "id"]) }
@@ -101,7 +113,9 @@ class XrayJiraCompleteTraceabilityTool(BaseTool):
                 t_vars = {
                     "projectKey": project_key,
                     "summary": raw_summary,
-                    "desc": test_desc
+                    "desc": raw_desc,
+                    "testType": test_type,
+                    "steps": formatted_steps
                 }
                 t_resp = requests.post(gql_url, json={"query": test_mutation, "variables": t_vars}, headers=headers, verify=False)
                 if t_resp.status_code != 200:
@@ -112,15 +126,15 @@ class XrayJiraCompleteTraceabilityTool(BaseTool):
                 except Exception:
                     results.append(f"ERROR: Failed to parse JSON from Xray. Response: {t_resp.text}")
                     continue
-                
+
                 if "errors" in t_json:
                     results.append(f"ERROR: Error creating Test: {json.dumps(t_json['errors'])}")
                     continue
-                    
+
                 t_data = t_json["data"]["createTest"]["test"]["jira"]
                 test_key = t_data["key"]
                 test_id = t_data["id"]
-                
+
                 # ==========================================
                 # 2. LINK USER STORY TO TESTS (Jira Native REST)
                 # ==========================================

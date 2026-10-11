@@ -17,7 +17,7 @@ from langchain_core.tools import tool
 @tool("search_orangeHRM_kb")
 def orangehrmDomain_kb_tool(query: str) -> str:
     """Searches the OrangeHRM knowledge base. Use this to get the context of the domain before generating test scenarios."""
-    print(f"\n[DEBUG] 🔍 AGENT IS SEARCHING KNOWLEDGE BASE FOR: {query}\n")
+    print(f"\n[DEBUG] AGENT IS SEARCHING KNOWLEDGE BASE FOR: {query}\n")
     retriever = vectorstore.as_retriever(search_kwargs={"filter": {"domain": "orangeHRM_domain"}, "k": 3})
     docs = retriever.invoke(query)
     return "\n\n".join([d.page_content for d in docs])
