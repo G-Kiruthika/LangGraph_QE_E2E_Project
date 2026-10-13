@@ -24,3 +24,10 @@ with open(testcases_output_path, "w") as f:
     json.dump(final_response.get("testcases", {}), f, indent=4)
     
 print(f"Testcases written to {testcases_output_path}")
+
+playwright_code = final_response.get("playwright_code", "")
+if playwright_code:
+    script_output_path = os.path.join("outputs", "final_test_script.py")
+    with open(script_output_path, "w", encoding="utf-8") as f:
+        f.write(playwright_code)
+    print(f"Playwright test script written to {script_output_path}")

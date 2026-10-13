@@ -31,3 +31,5 @@ typing_extensions
 IPython
 langchain_chroma
 langchain_tools
+pytest
+pytest-html
