@@ -1,8 +1,7 @@
 # src/agents/scenario_generator_agent.py
 from src.core.llm import llm
-from src.models.schemas import ScenarioResponse # The Pydantic model for a list of scenarios
 from langchain_core.prompts import ChatPromptTemplate
-from src.tools.rag_tools import orangehrmDomain_kb_tool
+from langgraph.prebuilt import create_react_agent
 
 system_prompt = """You are an expert QA Engineer. Generate a list of test scenarios for the given Jira story.
 Instructions:
@@ -13,9 +12,11 @@ Instructions:
 5. Your output must strictly follow the required JSON array format below. 
 6. Ensure all fields are present.  
 7. Limit the number of scenarios generated to a maximum of 10 only.   
-8. For the 'IssueId' field, you MUST extract and use the exact Jira issue key (e.g., QE-378) provided in the story description.
+8. For the 'IssueId' field, you MUST extract and use the exact Jira issue key (e.g., AUT-1) provided in the story description.
+9. Return ONLY the raw JSON inside ```json ``` code block.
 
 Expected JSON Array format for scenarios:
+```json
 [
   {
     "test_scenario_id": "TS-01",
@@ -25,16 +26,14 @@ Expected JSON Array format for scenarios:
     "test_data": "...",
     "navigable_path": "...",
     "acceptance_criteria_id": "...",
-    "IssueId": [issue_id from jira story]
+    "IssueId": "AUT-1"
   }
 ]
+```
 """
-
-from langgraph.prebuilt import create_react_agent
 
 scenario_generator_agent = create_react_agent(
     model=llm,
     tools=[],
-    prompt=system_prompt,
-    response_format=ScenarioResponse
+    prompt=system_prompt
 )

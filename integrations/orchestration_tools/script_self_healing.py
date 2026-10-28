@@ -9,7 +9,128 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 
 from src.agents.testscript_generator_agent import testscript_generator_agent
-from src.tools.locator_extractor_tool import get_application_locators_tool
+import urllib3
+import requests
+from html.parser import HTMLParser
+from langchain_core.tools import tool
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+class SimpleDOMParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.inputs = []
+        self.buttons = []
+        self.links = []
+        self.headings = []
+        self.current_tag = None
+        self.current_text = []
+
+    def handle_starttag(self, tag, attrs):
+        attr_dict = dict(attrs)
+        self.current_tag = tag
+        self.current_text = []
+
+        if tag == "input":
+            info = {
+                "name": attr_dict.get("name"),
+                "id": attr_dict.get("id"),
+                "placeholder": attr_dict.get("placeholder"),
+                "type": attr_dict.get("type", "text"),
+                "aria_label": attr_dict.get("aria-label")
+            }
+            if any(info.values()):
+                self.inputs.append(info)
+
+        elif tag == "button":
+            self.buttons.append({
+                "type": attr_dict.get("type", "button"),
+                "id": attr_dict.get("id"),
+                "class": attr_dict.get("class"),
+                "title": attr_dict.get("title")
+            })
+
+        elif tag == "a" and "href" in attr_dict:
+            self.links.append({
+                "href": attr_dict.get("href"),
+                "title": attr_dict.get("title")
+            })
+
+    def handle_data(self, data):
+        if self.current_tag in ["button", "h1", "h2", "h3", "h4", "h5", "h6", "p", "a"]:
+            cleaned = data.strip()
+            if cleaned:
+                self.current_text.append(cleaned)
+
+    def handle_endtag(self, tag):
+        text = " ".join(self.current_text).strip()
+        if tag == "button" and self.buttons:
+            self.buttons[-1]["text"] = text
+        elif tag in ["h1", "h2", "h3", "h4", "h5", "h6"] and text:
+            self.headings.append({"level": tag, "text": text})
+        self.current_tag = None
+        self.current_text = []
+
+
+def extract_locators_from_kb(query: str = "OrangeHRM") -> str:
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    kb_path = os.path.join(base_dir, "src", "knowledge_base", "orangehrm-login-dashboard-playwright-locators.txt")
+    if os.path.exists(kb_path):
+        try:
+            with open(kb_path, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception as e:
+            return f"Error reading KB locators: {e}"
+    return "No verified locators found in KB."
+
+
+def extract_locators_from_live_url(url: str) -> str:
+    if not url.startswith("http://") and not url.startswith("https://"):
+        return ""
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    try:
+        response = requests.get(url, headers=headers, verify=False, timeout=8)
+        if response.status_code == 200:
+            parser = SimpleDOMParser()
+            parser.feed(response.text)
+
+            locators_found = []
+            if parser.inputs:
+                locators_found.append("Inputs found:")
+                for inp in parser.inputs[:10]:
+                    locators_found.append(f"  - {inp}")
+            if parser.buttons:
+                locators_found.append("Buttons found:")
+                for btn in parser.buttons[:10]:
+                    locators_found.append(f"  - {btn}")
+            if parser.headings:
+                locators_found.append("Headings found:")
+                for h in parser.headings[:10]:
+                    locators_found.append(f"  - {h}")
+
+            return "\n".join(locators_found) if locators_found else "No interactive elements found in initial HTML."
+    except Exception as e:
+        return f"Live DOM extraction skipped ({e})"
+    return ""
+
+
+@tool("get_application_locators")
+def get_application_locators_tool(query_or_url: str) -> str:
+    """Retrieves verified and latest locators for the target application from the Knowledge Base and Live Application DOM."""
+    kb_locators = extract_locators_from_kb(query_or_url)
+    
+    url_match = re.search(r"https?://[^\s]+", query_or_url)
+    live_locators = ""
+    if url_match:
+        live_locators = extract_locators_from_live_url(url_match.group(0))
+
+    result = f"=== VERIFIED KNOWLEDGE BASE LOCATORS ===\n{kb_locators}\n"
+    if live_locators:
+        result += f"\n=== LIVE DOM EXTRACTED LOCATORS ===\n{live_locators}\n"
+    return result
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +208,7 @@ def _generate_playwright_html_report(report_path: str, story_summary: str, suite
         <tr style="border-bottom: 1px solid #334155;">
             <td style="padding: 12px; font-weight: bold; color: #38bdf8;">{tc_id}</td>
             <td style="padding: 12px;">{tc_summary}</td>
-            <td style="padding: 12px; font-family: monospace; font-size: 13px; color: #cbd5e1;">tests/{file_name}</td>
+            <td style="padding: 12px; font-family: monospace; font-size: 13px; color: #cbd5e1;">outputs/final_testscripts/{file_name}</td>
             <td style="padding: 12px;">{rounds}</td>
             <td style="padding: 12px;">{badge}</td>
         </tr>
@@ -208,7 +329,7 @@ def _generate_playwright_html_report(report_path: str, story_summary: str, suite
             <div>
                 <h1 style="margin: 0 0 8px 0;">Playwright Test Suite Execution Report</h1>
                 <p style="margin: 0; color: #94a3b8;">Jira Story: <strong>{story_summary}</strong></p>
-                <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px;">Test Scripts Folder: <code>tests/</code></p>
+                <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px;">Test Scripts Folder: <code>outputs/final_testscripts/</code></p>
             </div>
             <div class="badge">{overall_status}</div>
         </div>
@@ -237,7 +358,7 @@ def _generate_playwright_html_report(report_path: str, story_summary: str, suite
         </div>
 
         <div class="section">
-            <h2 style="margin-top: 0; font-size: 18px;">Test Cases & Individual Test Scripts (in tests/)</h2>
+            <h2 style="margin-top: 0; font-size: 18px;">Test Cases & Individual Test Scripts (in outputs/final_testscripts/)</h2>
             <table>
                 <thead>
                     <tr>
@@ -278,7 +399,7 @@ class ScriptSelfHealingSchema(BaseModel):
 class ScriptSelfHealingTool(BaseTool):
     name: str = "ScriptSelfHealingTool"
     description: str = (
-        "Generates individual Playwright Python test scripts for each test case in the tests/ folder, "
+        "Generates individual Playwright Python test scripts for each test case in the outputs/final_testscripts/ folder, "
         "executes them against the application, and automatically self-heals scripts if failures occur."
     )
     args_schema: Type[BaseModel] = ScriptSelfHealingSchema
@@ -293,6 +414,8 @@ class ScriptSelfHealingTool(BaseTool):
                 [sys.executable, script_path],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=timeout_seconds,
                 env=env
             )
@@ -319,10 +442,10 @@ class ScriptSelfHealingTool(BaseTool):
 
     def _run(self, story_summary: str, testcases_json: str, target_url: str = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login", max_retries: int = 5, **kwargs) -> str:
         max_retries = int(kwargs.get("max_retries") or max_retries or os.getenv("SCRIPT_MAX_RETRIES", 5))
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         
-        # Test scripts destination folder is tests/
-        tests_dir = os.path.join(base_dir, "tests")
+        # Test scripts destination folder is outputs/final_testscripts/
+        tests_dir = os.path.join(base_dir, "outputs", "final_testscripts")
         reports_dir = os.path.join(base_dir, "outputs", "reports")
         videos_dir = os.path.join(reports_dir, "videos")
         
@@ -346,7 +469,7 @@ class ScriptSelfHealingTool(BaseTool):
             # Fallback if raw text
             parsed_cases = [{"scenario_id": "TS-01", "summary": story_summary, "description": testcases_json, "steps": []}]
 
-        print(f"\n--- [Self-Healing Script Tool] Loaded {len(parsed_cases)} test case(s) for script generation in tests/ ---")
+        print(f"\n--- [Self-Healing Script Tool] Loaded {len(parsed_cases)} test case(s) for script generation in outputs/final_testscripts/ ---")
 
         # 2. Retrieve Locators Context once for efficiency
         print("--- [Self-Healing Script Tool] Fetching latest application locators ---")
@@ -355,7 +478,7 @@ class ScriptSelfHealingTool(BaseTool):
         except Exception as e:
             locators_context = f"Locator extraction fallback ({e})"
 
-        # 3. Process each testcase into a separate test script in tests/
+        # 3. Process each testcase into a separate test script in outputs/final_testscripts/
         suite_results = []
         all_scripts_code = {}
 
@@ -371,7 +494,7 @@ class ScriptSelfHealingTool(BaseTool):
             script_file_path = os.path.join(tests_dir, script_filename)
 
             print(f"\n=======================================================")
-            print(f"[{idx+1}/{len(parsed_cases)}] Generating & Healing Script: tests/{script_filename}")
+            print(f"[{idx+1}/{len(parsed_cases)}] Generating & Healing Script: outputs/final_testscripts/{script_filename}")
             print(f"Test Case: {tc_id} - {tc_summary}")
             print(f"=======================================================")
 
@@ -389,6 +512,7 @@ class ScriptSelfHealingTool(BaseTool):
                 f"- Include necessary imports and helper functions (`navigate_to`, `login_to_orangehrm` if dashboard auth is required)\n"
                 f"- If testing login page, ensure `page.context.clear_cookies()` is called before navigation\n"
                 f"- Include the `if __name__ == '__main__':` runner block with video recording to `outputs/reports/videos`\n"
+                f"- MUST use Python Playwright syntax with snake_case: to_have_url, get_by_role, fill, click (NEVER JS syntax)\n"
                 f"- Return ONLY the Python code inside ```python ```"
             )
 
@@ -404,7 +528,7 @@ class ScriptSelfHealingTool(BaseTool):
 
             while rounds < max_retries:
                 rounds += 1
-                print(f"[RUN] Executing tests/{script_filename} (Round {rounds}/{max_retries})...")
+                print(f"[RUN] Executing outputs/final_testscripts/{script_filename} (Round {rounds}/{max_retries})...")
 
                 with open(script_file_path, "w", encoding="utf-8") as f:
                     f.write(current_script)
@@ -413,7 +537,7 @@ class ScriptSelfHealingTool(BaseTool):
                 last_exec = exec_result
 
                 if exec_result["passed"]:
-                    print(f"[PASSED] tests/{script_filename} executed successfully in Round {rounds}!")
+                    print(f"[PASSED] outputs/final_testscripts/{script_filename} executed successfully in Round {rounds}!")
                     is_passed = True
                     break
                 else:
@@ -422,12 +546,12 @@ class ScriptSelfHealingTool(BaseTool):
                     print(f"[FAILED] Round {rounds} failed: {safe_snip}...")
 
                     if rounds >= max_retries:
-                        print(f"Reached max retries ({max_retries}) for tests/{script_filename}.")
+                        print(f"Reached max retries ({max_retries}) for outputs/final_testscripts/{script_filename}.")
                         break
 
-                    print(f"[HEALING] Self-healing tests/{script_filename} for Round {rounds + 1}...")
+                    print(f"[HEALING] Self-healing outputs/final_testscripts/{script_filename} for Round {rounds + 1}...")
                     heal_prompt = (
-                        f"The test script tests/{script_filename} for {tc_id} failed with the following error:\n\n"
+                        f"The test script outputs/final_testscripts/{script_filename} for {tc_id} failed with the following error:\n\n"
                         f"=== SCRIPT ===\n{current_script}\n\n"
                         f"=== ERROR TRACEBACK ===\n{err_snippet}\n\n"
                         f"=== LOCATORS CONTEXT ===\n{locators_context}\n\n"
@@ -439,7 +563,7 @@ class ScriptSelfHealingTool(BaseTool):
                     h_code = getattr(h_msg, "content", "") if hasattr(h_msg, "content") else str(h_msg)
                     current_script = _extract_python_code(h_code)
 
-            # Save final version to tests/
+            # Save final version to outputs/final_testscripts/
             with open(script_file_path, "w", encoding="utf-8") as f:
                 f.write(current_script)
 
@@ -470,11 +594,13 @@ class ScriptSelfHealingTool(BaseTool):
         # 5. Run Pytest across the entire tests/ folder
         pytest_report_path = os.path.join(reports_dir, "pytest_report.html")
         try:
-            print(f"\n--- [Self-Healing Script Tool] Executing Pytest suite across tests/ ---")
+            print(f"\n--- [Self-Healing Script Tool] Executing Pytest suite across outputs/final_testscripts/ ---")
             subprocess.run(
                 [sys.executable, "-m", "pytest", tests_dir, f"--html={pytest_report_path}", "--self-contained-html"],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=120
             )
             print(f"[REPORT] Pytest HTML report generated at: {pytest_report_path}")

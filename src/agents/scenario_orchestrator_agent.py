@@ -1,5 +1,5 @@
 from src.core.llm import llm
-from src.tools.scenario_self_healing_tool import ScenarioSelfHealingGeneratorToolV1
+from integrations.orchestration_tools.scenario_self_healing import ScenarioSelfHealingGeneratorToolV1
 from langgraph.prebuilt import create_react_agent
 
 # 1. Initialize the self-healing tool

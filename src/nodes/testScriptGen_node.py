@@ -1,13 +1,14 @@
 import os
 import json
 from src.core.state import GraphState
-from src.tools.script_self_healing_tool import ScriptSelfHealingTool
+from integrations.orchestration_tools.script_self_healing import ScriptSelfHealingTool
 
 script_healing_tool = ScriptSelfHealingTool()
 
+
 def generate_and_heal_test_scripts(state: GraphState):
-    print("\n--- Generating & Self-Healing Individual Playwright Test Scripts in tests/ ---")
-    
+    print("\n--- Generating & Self-Healing Individual Playwright Test Scripts in outputs/final_testscripts/ ---")
+
     # 1. Extract testcases from state
     testcases_data = state.get("testcases", {})
     if isinstance(testcases_data, dict):
@@ -32,7 +33,7 @@ def generate_and_heal_test_scripts(state: GraphState):
 
     target_url = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
 
-    # 3. Run Self-Healing Test Script Tool
+    # 3. Run Self-Healing Test Script Tool (outputs to outputs/final_testscripts/)
     max_retries = int(os.getenv("SCRIPT_MAX_RETRIES", "5"))
     tool_output_str = script_healing_tool._run(
         story_summary=story_summary,
@@ -54,9 +55,9 @@ def generate_and_heal_test_scripts(state: GraphState):
         print(f"\n--- Test Scripts Generation Completed ---")
         print(f"Overall Status: {status} ({passed_count}/{total_tests} Passed, {healed_count} Healed)")
         print(f"Playwright HTML Report: {report_file}")
-        print("Generated Test Scripts in tests/:")
+        print("Generated Test Scripts in outputs/final_testscripts/:")
         for s in generated_scripts:
-            print(f"  - [{s.get('status')}] {s.get('scenario_id')}: tests/{os.path.basename(s.get('file', ''))} (Rounds: {s.get('rounds')})")
+            print(f"  - [{s.get('status')}] {s.get('scenario_id')}: outputs/final_testscripts/{os.path.basename(s.get('file', ''))} (Rounds: {s.get('rounds')})")
     except Exception as e:
         print(f"Warning parsing tool output: {e}")
 

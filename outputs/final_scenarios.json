@@ -1,106 +1,69 @@
 {
-    "jira_story": [
-        {
-            "type": "text",
-            "text": "Here are the details for the requested Jira ticket:\n\n*   **issue_key:** QE-378\n*   **summary:** Login and access dashboard in OrangeHRM\n*   **description:** \n    As an OrangeHRM user,\n    I want to log in with valid credentials and be redirected to the dashboard,\n    so that I can quickly view my work status, pending actions, and access common HR functions.\n\n    **Acceptance Criteria**\n    AC1: User is able to open the OrangeHRM login page.\n    AC2: Login page displays Username, Password, and Login button.\n    AC3: User is able to enter valid credentials and click Login.\n    AC4: On successful login, user is redirected to the Dashboard page.\n    AC5: Dashboard page displays the Dashboard heading.\n    AC6: Dashboard page displays key widgets including Time at Work, My Actions, and Quick Launch.\n    AC7: User can view dashboard information after login without errors.\n    AC8: User can use dashboard shortcuts to access common HR actions.\n\n    **Business Value:**\n    Provides a secure entry point and immediate access to important employee actions and information.\n\n    **Definition of Done:**\n    1. Login flow works with valid credentials.\n    2. Dashboard loads successfully after login.\n    3. Key dashboard widgets are visible.\n    4. Flow is validated through testing.\n*   **status:** To Do",
-            "extras": {
-                "signature": "EnMKcQFpFH0TmXoyR4rc0kD/MzT3vOfEtkbGuARuXuoA1ZKTGiXK3nVuCw0qkKfpJhEyDcTes0MXOiMM5v29I6dJ+w1zxU0Fjb3M9SyeTGIA+8hI6E6UM5l79zLhZtqaR08xGdvhOobY8mKuYYKFwyOY5a5Z"
-            }
-        }
-    ],
+    "issue_key": "AUT-1",
+    "jira_story": "- **issue_key**: AUT-1\n- **summary**: Login and access dashboard in OrangeHRM\n- **description**: \nDescription:\nAs an OrangeHRM user,\nI want to log in with valid credentials and be redirected to the dashboard,\nso that I can quickly view my work status, pending actions, and access common HR functions.\n\nAcceptance Criteria\nAC1: User is able to open the OrangeHRM login page.\nGiven the user is not logged in\nWhen the user opens the OrangeHRM application\nThen the login page should be displayed\n\nAC2: Login page displays Username, Password, and Login button.\nGiven the user is on the OrangeHRM login page\nWhen the page loads\nThen the Username field, Password field, and Login button should be visible\n\nAC3: User is able to enter valid credentials and click Login.\nGiven the user is on the OrangeHRM login page\nWhen the user enters valid credentials and clicks the Login button\nThen the login should be submitted successfully\n\nAC4: On successful login, user is redirected to the Dashboard page.\nGiven the user has logged in successfully\nWhen authentication is completed\nThen the user should be redirected to the Dashboard page\n\nAC5: Dashboard page displays the Dashboard heading.\nGiven the user is on the Dashboard page\nWhen the page loads\nThen the Dashboard heading should be visible\n\nAC6: Dashboard page displays key widgets including Time at Work, My Actions, and Quick Launch.\nGiven the user is on the Dashboard page\nWhen the page loads\nThen the Time at Work, My Actions, and Quick Launch widgets should be visible\n\nAC7: User can view dashboard information after login without errors.\nGiven the user is on the Dashboard page\nWhen the page loads\nThen the dashboard information should be displayed without errors\n\nAC8: User can use dashboard shortcuts to access common HR actions.\nGiven the user is on the Dashboard page\nWhen the user selects a dashboard shortcut\nThen the corresponding HR action should open successfully\n\nBusiness Value:\nProvides a secure entry point and immediate access to important employee actions and information.\n\nDefinition of Done:\n1. Login flow works with valid credentials.\n2. Dashboard loads successfully after login.\n3. Key dashboard widgets are visible.\n4. Flow is validated through testing.\n\n- **status**: To Do",
     "test_scenarios": {
         "status": "ok",
-        "confidencescore": 92,
+        "confidencescore": 90,
         "threshold": 85,
         "rounds": 1,
         "healingtriggered": false,
         "scenarios": [
             {
                 "test_scenario_id": "TS-01",
-                "test_scenario_description": "Verify login page elements are displayed correctly",
-                "expected_results": "Username field, Password field, and Login button are visible.",
-                "preconditions": "User is on the login page.",
-                "test_data": "N/A",
-                "navigable_path": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-                "acceptance_criteria_id": "AC1, AC2",
-                "IssueId": "QE-378"
+                "test_scenario_description": "Verify successful login with valid credentials and redirection to the dashboard",
+                "expected_results": "User is successfully authenticated and redirected to the dashboard URL",
+                "preconditions": "User is on the login page",
+                "test_data": "Valid Username and Password",
+                "navigable_path": "Login Page -> Enter Credentials -> Click Login",
+                "acceptance_criteria_id": "AC-01",
+                "IssueId": "AUT-1"
             },
             {
                 "test_scenario_id": "TS-02",
-                "test_scenario_description": "Verify successful login with valid credentials",
-                "expected_results": "User is redirected to the Dashboard page.",
-                "preconditions": "User is on the login page.",
-                "test_data": "Username: Admin, Password: admin123",
-                "navigable_path": "Login Page -> Enter Credentials -> Click Login",
-                "acceptance_criteria_id": "AC3, AC4",
-                "IssueId": "QE-378"
+                "test_scenario_description": "Verify login fails with invalid username and valid password",
+                "expected_results": "Error message indicating invalid credentials is displayed and user remains on the login page",
+                "preconditions": "User is on the login page",
+                "test_data": "Invalid Username, Valid Password",
+                "navigable_path": "Login Page -> Enter Invalid Credentials -> Click Login",
+                "acceptance_criteria_id": "AC-02",
+                "IssueId": "AUT-1"
             },
             {
                 "test_scenario_id": "TS-03",
-                "test_scenario_description": "Verify dashboard page displays required heading and widgets",
-                "expected_results": "Dashboard heading is visible; Time at Work, My Actions, and Quick Launch widgets are loaded.",
-                "preconditions": "User is logged in successfully.",
-                "test_data": "N/A",
-                "navigable_path": "Dashboard page",
-                "acceptance_criteria_id": "AC5, AC6",
-                "IssueId": "QE-378"
+                "test_scenario_description": "Verify login fails with valid username and invalid password",
+                "expected_results": "Error message indicating invalid credentials is displayed and user remains on the login page",
+                "preconditions": "User is on the login page",
+                "test_data": "Valid Username, Invalid Password",
+                "navigable_path": "Login Page -> Enter Invalid Credentials -> Click Login",
+                "acceptance_criteria_id": "AC-02",
+                "IssueId": "AUT-1"
             },
             {
                 "test_scenario_id": "TS-04",
-                "test_scenario_description": "Verify dashboard accessibility and error-free loading",
-                "expected_results": "Dashboard loads without console errors or UI breakage.",
-                "preconditions": "User is logged in successfully.",
-                "test_data": "N/A",
-                "navigable_path": "Dashboard page",
-                "acceptance_criteria_id": "AC7",
-                "IssueId": "QE-378"
+                "test_scenario_description": "Verify login fails when both username and password fields are left blank",
+                "expected_results": "Validation error messages 'Required' are displayed under both fields",
+                "preconditions": "User is on the login page",
+                "test_data": "Blank Username, Blank Password",
+                "navigable_path": "Login Page -> Leave Fields Blank -> Click Login",
+                "acceptance_criteria_id": "AC-03",
+                "IssueId": "AUT-1"
             },
             {
                 "test_scenario_id": "TS-05",
-                "test_scenario_description": "Verify functionality of dashboard shortcuts",
-                "expected_results": "Clicking a shortcut redirects the user to the corresponding HR action page.",
-                "preconditions": "User is logged in successfully.",
-                "test_data": "Quick Launch shortcut (e.g., Assign Leave)",
-                "navigable_path": "Dashboard -> Quick Launch widget",
-                "acceptance_criteria_id": "AC8",
-                "IssueId": "QE-378"
-            },
-            {
-                "test_scenario_id": "TS-06",
-                "test_scenario_description": "Verify login failure with invalid credentials",
-                "expected_results": "System displays an error message and does not redirect to the dashboard.",
-                "preconditions": "User is on the login page.",
-                "test_data": "Username: InvalidUser, Password: WrongPassword",
-                "navigable_path": "Login Page -> Enter Credentials -> Click Login",
-                "acceptance_criteria_id": "AC3",
-                "IssueId": "QE-378"
-            },
-            {
-                "test_scenario_id": "TS-07",
-                "test_scenario_description": "Verify login failure with empty credentials",
-                "expected_results": "System displays validation messages for required fields.",
-                "preconditions": "User is on the login page.",
-                "test_data": "Username: empty, Password: empty",
-                "navigable_path": "Login Page -> Click Login",
-                "acceptance_criteria_id": "AC3",
-                "IssueId": "QE-378"
-            },
-            {
-                "test_scenario_id": "TS-08",
-                "test_scenario_description": "Verify password masking in the login field",
-                "expected_results": "Characters entered in the password field are masked (e.g., dots or asterisks).",
-                "preconditions": "User is on the login page.",
-                "test_data": "Password: testpassword123",
-                "navigable_path": "Login Page -> Password field",
-                "acceptance_criteria_id": "AC2",
-                "IssueId": "QE-378"
+                "test_scenario_description": "Verify dashboard displays the correct version number in the footer",
+                "expected_results": "Footer displays version 'OrangeHRM OS 5.9'",
+                "preconditions": "User is logged in and on the dashboard",
+                "test_data": "None",
+                "navigable_path": "Dashboard -> Scroll to Footer",
+                "acceptance_criteria_id": "AC-04",
+                "IssueId": "AUT-1"
             }
         ],
-        "reviewerfeedback": "The test scenarios provide excellent coverage of the acceptance criteria, including necessary negative testing (invalid/empty credentials) and security basics (password masking). Strengths: Clear mapping to ACs, logical flow, and inclusion of edge cases. Gaps: While the coverage is strong, the scenarios could be further improved by adding a scenario for session persistence or logout behavior to ensure the 'secure entry point' business value is fully validated, though this is technically outside the strict scope of the provided ACs. The scenarios are well-structured and non-redundant.",
+        "reviewerfeedback": "The test scenarios provide good coverage for the positive login flow, invalid credential variations, empty fields validation, and dashboard footer verification according to the context. TS-02 and TS-03 could potentially be parameterized into a single scenario for invalid credentials, but keeping them separate is acceptable for clarity. Overall coverage and structure are strong.",
         "trajectory": [
             {
                 "round": 1,
-                "confidence": 92,
+                "confidence": 90,
                 "decision": "STOP threshold-met"
             }
         ]
@@ -113,131 +76,112 @@
         "healingtriggered": false,
         "testcases": [
             {
-                "summary": "[QE-378] Verify login page elements are displayed correctly",
-                "description": "**Objective:** Ensure all required UI elements are present on the login page.\n\n**Preconditions:**\nUser is on the login page (https://opensource-demo.orangehrmlive.com/web/index.php/auth/login).\n\n**Postconditions:**\nNone.",
+                "summary": "[AUT-1] Verify successful login with valid credentials and redirection to the dashboard",
+                "description": "**Objective:** Ensure user can log in with valid credentials and reach the dashboard.\n\n**Preconditions:**\nUser is on the login page at https://opensource-demo.orangehrmlive.com/web/index.php/auth/login.\n\n**Postconditions:**\nUser is authenticated and redirected to the dashboard.",
                 "test_type": "Functional",
                 "scenario_id": "TS-01",
                 "steps": [
                     {
-                        "action": "Navigate to the login URL",
-                        "data": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-                        "expected_result": "Login page loads successfully"
+                        "action": "Navigate to the OrangeHRM login page",
+                        "data": "URL: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+                        "expected_result": "Login page is displayed with Username, Password fields and Login button."
                     },
-                    {
-                        "action": "Inspect page elements",
-                        "data": "N/A",
-                        "expected_result": "Username field, Password field, and Login button are visible"
-                    }
-                ]
-            },
-            {
-                "summary": "[QE-378] Verify successful login with valid credentials",
-                "description": "**Objective:** Ensure valid credentials grant access to the dashboard.\n\n**Preconditions:**\nUser is on the login page.\n\n**Postconditions:**\nUser is authenticated and redirected to the dashboard.",
-                "test_type": "Functional",
-                "scenario_id": "TS-02",
-                "steps": [
                     {
                         "action": "Enter valid username and password",
                         "data": "Username: Admin, Password: admin123",
-                        "expected_result": "Credentials entered correctly"
+                        "expected_result": "Credentials are entered into the respective fields."
                     },
                     {
-                        "action": "Click Login button",
+                        "action": "Click the Login button",
                         "data": "N/A",
-                        "expected_result": "User is redirected to the Dashboard page"
+                        "expected_result": "User is successfully authenticated and redirected to the dashboard URL (https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index)."
                     }
                 ]
             },
             {
-                "summary": "[QE-378] Verify dashboard page displays required heading and widgets",
-                "description": "**Objective:** Ensure the dashboard contains all expected functional widgets.\n\n**Preconditions:**\nUser is logged in successfully.\n\n**Postconditions:**\nNone.",
-                "test_type": "Functional",
+                "summary": "[AUT-1] Verify login fails with invalid username and valid password",
+                "description": "**Objective:** Ensure the system restricts access and shows an error when an invalid username is provided.\n\n**Preconditions:**\nUser is on the login page at https://opensource-demo.orangehrmlive.com/web/index.php/auth/login.\n\n**Postconditions:**\nUser remains on the login page and is not authenticated.",
+                "test_type": "Negative",
+                "scenario_id": "TS-02",
+                "steps": [
+                    {
+                        "action": "Navigate to the OrangeHRM login page",
+                        "data": "URL: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+                        "expected_result": "Login page is displayed."
+                    },
+                    {
+                        "action": "Enter invalid username and valid password",
+                        "data": "Username: InvalidUser, Password: admin123",
+                        "expected_result": "Invalid credentials entered."
+                    },
+                    {
+                        "action": "Click the Login button",
+                        "data": "N/A",
+                        "expected_result": "Error message indicating invalid credentials is displayed and user remains on the login page."
+                    }
+                ]
+            },
+            {
+                "summary": "[AUT-1] Verify login fails with valid username and invalid password",
+                "description": "**Objective:** Ensure the system restricts access and shows an error when an invalid password is provided.\n\n**Preconditions:**\nUser is on the login page at https://opensource-demo.orangehrmlive.com/web/index.php/auth/login.\n\n**Postconditions:**\nUser remains on the login page and is not authenticated.",
+                "test_type": "Negative",
                 "scenario_id": "TS-03",
                 "steps": [
                     {
-                        "action": "Observe Dashboard page content",
+                        "action": "Navigate to the OrangeHRM login page",
+                        "data": "URL: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+                        "expected_result": "Login page is displayed."
+                    },
+                    {
+                        "action": "Enter valid username and invalid password",
+                        "data": "Username: Admin, Password: WrongPassword123",
+                        "expected_result": "Credentials entered."
+                    },
+                    {
+                        "action": "Click the Login button",
                         "data": "N/A",
-                        "expected_result": "Dashboard heading is visible; Time at Work, My Actions, and Quick Launch widgets are loaded"
+                        "expected_result": "Error message indicating invalid credentials is displayed and user remains on the login page."
                     }
                 ]
             },
             {
-                "summary": "[QE-378] Verify dashboard accessibility and error-free loading",
-                "description": "**Objective:** Ensure the dashboard loads without technical errors.\n\n**Preconditions:**\nUser is logged in successfully.\n\n**Postconditions:**\nNone.",
-                "test_type": "Non-functional",
+                "summary": "[AUT-1] Verify login fails when both username and password fields are left blank",
+                "description": "**Objective:** Ensure form validation triggers when mandatory login fields are empty.\n\n**Preconditions:**\nUser is on the login page at https://opensource-demo.orangehrmlive.com/web/index.php/auth/login.\n\n**Postconditions:**\nUser remains on the login page without submitting credentials.",
+                "test_type": "Negative",
                 "scenario_id": "TS-04",
                 "steps": [
                     {
-                        "action": "Open browser developer tools (Console tab)",
-                        "data": "N/A",
-                        "expected_result": "No console errors or UI breakage observed"
+                        "action": "Navigate to the OrangeHRM login page",
+                        "data": "URL: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+                        "expected_result": "Login page is displayed."
+                    },
+                    {
+                        "action": "Leave Username and Password fields blank and click Login",
+                        "data": "Username: [Blank], Password: [Blank]",
+                        "expected_result": "Validation error messages 'Required' are displayed under both fields."
                     }
                 ]
             },
             {
-                "summary": "[QE-378] Verify functionality of dashboard shortcuts",
-                "description": "**Objective:** Ensure Quick Launch shortcuts navigate to correct modules.\n\n**Preconditions:**\nUser is logged in successfully.\n\n**Postconditions:**\nUser is redirected to the target HR action page.",
+                "summary": "[AUT-1] Verify dashboard displays the correct version number in the footer",
+                "description": "**Objective:** Verify that the correct application version is rendered in the footer of the dashboard.\n\n**Preconditions:**\nUser is logged in and on the dashboard page at https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index.\n\n**Postconditions:**\nDashboard and footer version information are visible.",
                 "test_type": "Functional",
                 "scenario_id": "TS-05",
                 "steps": [
                     {
-                        "action": "Click on a shortcut in the Quick Launch widget (e.g., Assign Leave)",
-                        "data": "Quick Launch shortcut",
-                        "expected_result": "User is redirected to the corresponding HR action page"
-                    }
-                ]
-            },
-            {
-                "summary": "[QE-378] Verify login failure with invalid credentials",
-                "description": "**Objective:** Ensure invalid credentials prevent access.\n\n**Preconditions:**\nUser is on the login page.\n\n**Postconditions:**\nUser remains on the login page.",
-                "test_type": "Negative",
-                "scenario_id": "TS-06",
-                "steps": [
-                    {
-                        "action": "Enter invalid username and password",
-                        "data": "Username: InvalidUser, Password: WrongPassword",
-                        "expected_result": "Credentials entered"
+                        "action": "Log in to OrangeHRM and navigate to the dashboard",
+                        "data": "Valid Username and Password",
+                        "expected_result": "Dashboard page is loaded successfully."
                     },
                     {
-                        "action": "Click Login button",
+                        "action": "Scroll to the bottom of the dashboard page to inspect the footer",
                         "data": "N/A",
-                        "expected_result": "System displays an error message and does not redirect to the dashboard"
-                    }
-                ]
-            },
-            {
-                "summary": "[QE-378] Verify login failure with empty credentials",
-                "description": "**Objective:** Ensure empty fields trigger validation messages.\n\n**Preconditions:**\nUser is on the login page.\n\n**Postconditions:**\nUser remains on the login page.",
-                "test_type": "Negative",
-                "scenario_id": "TS-07",
-                "steps": [
-                    {
-                        "action": "Leave username and password fields empty",
-                        "data": "N/A",
-                        "expected_result": "Fields are empty"
-                    },
-                    {
-                        "action": "Click Login button",
-                        "data": "N/A",
-                        "expected_result": "System displays validation messages for required fields"
-                    }
-                ]
-            },
-            {
-                "summary": "[QE-378] Verify password masking in the login field",
-                "description": "**Objective:** Ensure password security via masking.\n\n**Preconditions:**\nUser is on the login page.\n\n**Postconditions:**\nNone.",
-                "test_type": "Non-functional",
-                "scenario_id": "TS-08",
-                "steps": [
-                    {
-                        "action": "Enter text into the password field",
-                        "data": "Password: testpassword123",
-                        "expected_result": "Characters entered in the password field are masked (e.g., dots or asterisks)"
+                        "expected_result": "Footer displays version 'OrangeHRM OS 5.9'."
                     }
                 ]
             }
         ],
-        "reviewerfeedback": "The test cases are well-structured, clearly mapped to the scenario IDs, and follow the acceptance criteria accurately. The steps are logical, and the test types are appropriately assigned. Strengths: Excellent coverage of both positive and negative flows, clear preconditions/postconditions, and adherence to the provided scenario list. Gaps: Minor improvement could be made by specifying the exact error message text in TS-06 and TS-07 to make the expected results more verifiable, but this does not detract from the overall high quality.",
+        "reviewerfeedback": "The generated test cases are exceptionally well-structured and fully traceable back to the provided scenario IDs (TS-01 through TS-05). Each test case includes clear descriptions detailing preconditions and postconditions, highly appropriate test types (Functional and Negative), and comprehensive step-by-step actions with precise test data and expected results. The use of knowledge base context like URLs and application versions adds great value and realism.",
         "trajectory": [
             {
                 "round": 1,
@@ -245,7 +189,59 @@
                 "decision": "STOP threshold-met"
             }
         ],
-        "xray_sync_result": "SUCCESS: Created Test QE-926. Linked successfully to Story QE-378.\nSUCCESS: Created Test QE-927. Linked successfully to Story QE-378.\nSUCCESS: Created Test QE-928. Linked successfully to Story QE-378.\nSUCCESS: Created Test QE-929. Linked successfully to Story QE-378.\nSUCCESS: Created Test QE-930. Linked successfully to Story QE-378.\nSUCCESS: Created Test QE-931. Linked successfully to Story QE-378.\nSUCCESS: Created Test QE-932. Linked successfully to Story QE-378.\nSUCCESS: Created Test QE-933. Linked successfully to Story QE-378."
+        "xray_sync_result": "I have successfully uploaded and linked the test cases to story **AUT-1** in project **AUT**:\n\n1. **[TS-01]** Created Test **AUT-11** (Verify successful login with valid credentials and redirection to the dashboard) - *Linked successfully*.\n2. **[TS-02]** Created Test **AUT-12** (Verify login fails with invalid username and valid password) - *Linked successfully*.\n3. **[TS-03]** Created Test **AUT-13** (Verify login fails with valid username and invalid password) - *Linked successfully*.\n4. **[TS-04]** Created Test **AUT-14** (Verify login fails when both username and password fields are left blank) - *Linked successfully*.\n5. **[TS-05]** Created Test **AUT-15** (Verify dashboard displays the correct version number in the footer) - *Linked successfully*."
     },
-    "playwright_code": "{\n  \"status\": \"FAILED_AFTER_RETRIES\",\n  \"rounds\": 5,\n  \"self_healed\": false,\n  \"script_file\": \"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\",\n  \"report_file\": \"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\reports\\\\playwright_report.html\",\n  \"videos_dir\": \"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\reports\\\\videos\",\n  \"healing_history\": [\n    {\n      \"round\": 1,\n      \"status\": \"FAILED\",\n      \"error\": \"Traceback (most recent call last):\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 76, in <module>\\n    test_dashboard_widgets(page)\\n    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 38, in test_dashboard_widgets\\n    test_successful_login(page)\\n    ~~~~~~~~~~~~~~~~~~~~~^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 30, in test_successful_login\\n    page.locator('input[name=\\\"username\\\"]').fill(USERNAME)\\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\sync_api\\\\_generated.py\\\", line 17780, in fill\\n    self._sync(\\n    ~~~~~~~~~~^\\n        self._impl_obj.fill(\\n        ^^^^^^^^^^^^^^^^^^^^\\n    ...<4 lines>...\\n        )\\n        ^\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_sync_base.py\\\", line 115, in _sync\\n    return task.result()\\n           ~~~~~~~~~~~^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_locator.py\\\", line 216, in fill\\n    return await self._frame.fill(self._selector, strict=True, **params)\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 610, in fill\\n    await self._fill(**locals_to_params(locals()))\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 622, in _fill\\n    await self._channel.send(\\\"fill\\\", self._timeout, locals_to_params(locals()))\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 69, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n    ...<3 lines>...\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 559, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.TimeoutError: Locator.fill: Timeout 20000ms exceeded.\\nCall log:\\n  - waiting for locator(\\\"input[name=\\\\\\\"username\\\\\\\"]\\\")\"\n    },\n    {\n      \"round\": 2,\n      \"status\": \"FAILED\",\n      \"error\": \"Traceback (most recent call last):\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 81, in <module>\\n    test_login_failure_invalid_credentials(page)\\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 51, in test_login_failure_invalid_credentials\\n    page.locator('input[name=\\\"username\\\"]').fill(\\\"InvalidUser\\\")\\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\sync_api\\\\_generated.py\\\", line 17780, in fill\\n    self._sync(\\n    ~~~~~~~~~~^\\n        self._impl_obj.fill(\\n        ^^^^^^^^^^^^^^^^^^^^\\n    ...<4 lines>...\\n        )\\n        ^\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_sync_base.py\\\", line 115, in _sync\\n    return task.result()\\n           ~~~~~~~~~~~^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_locator.py\\\", line 216, in fill\\n    return await self._frame.fill(self._selector, strict=True, **params)\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 610, in fill\\n    await self._fill(**locals_to_params(locals()))\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 622, in _fill\\n    await self._channel.send(\\\"fill\\\", self._timeout, locals_to_params(locals()))\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 69, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n    ...<3 lines>...\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 559, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.TimeoutError: Locator.fill: Timeout 20000ms exceeded.\\nCall log:\\n  - waiting for locator(\\\"input[name=\\\\\\\"username\\\\\\\"]\\\")\"\n    },\n    {\n      \"round\": 3,\n      \"status\": \"FAILED\",\n      \"error\": \"Execution timed out after 90s\"\n    },\n    {\n      \"round\": 4,\n      \"status\": \"FAILED\",\n      \"error\": \"Traceback (most recent call last):\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 91, in <module>\\n    test_login_failure(page)\\n    ~~~~~~~~~~~~~~~~~~^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 65, in test_login_failure\\n    page.locator('input[name=\\\"username\\\"]').fill(\\\"InvalidUser\\\")\\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\sync_api\\\\_generated.py\\\", line 17780, in fill\\n    self._sync(\\n    ~~~~~~~~~~^\\n        self._impl_obj.fill(\\n        ^^^^^^^^^^^^^^^^^^^^\\n    ...<4 lines>...\\n        )\\n        ^\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_sync_base.py\\\", line 115, in _sync\\n    return task.result()\\n           ~~~~~~~~~~~^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_locator.py\\\", line 216, in fill\\n    return await self._frame.fill(self._selector, strict=True, **params)\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 610, in fill\\n    await self._fill(**locals_to_params(locals()))\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 622, in _fill\\n    await self._channel.send(\\\"fill\\\", self._timeout, locals_to_params(locals()))\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 69, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n    ...<3 lines>...\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 559, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.TimeoutError: Locator.fill: Timeout 25000ms exceeded.\\nCall log:\\n  - waiting for locator(\\\"input[name=\\\\\\\"username\\\\\\\"]\\\")\"\n    },\n    {\n      \"round\": 5,\n      \"status\": \"FAILED\",\n      \"error\": \"Traceback (most recent call last):\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 83, in <module>\\n    test_login_failure(page)\\n    ~~~~~~~~~~~~~~~~~~^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 55, in test_login_failure\\n    username_input.wait_for(state='visible', timeout=15000)\\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\sync_api\\\\_generated.py\\\", line 20048, in wait_for\\n    self._sync(\\n    ~~~~~~~~~~^\\n        self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)\\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_sync_base.py\\\", line 115, in _sync\\n    return task.result()\\n           ~~~~~~~~~~~^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_locator.py\\\", line 741, in wait_for\\n    await self._frame.wait_for_selector(\\n        self._selector, strict=True, timeout=timeout, state=state\\n    )\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 372, in wait_for_selector\\n    await self._channel.send(\\n        \\\"waitForSelector\\\", self._timeout, locals_to_params(locals())\\n    )\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 69, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n    ...<3 lines>...\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 559, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.TimeoutError: Locator.wait_for: Timeout 15000ms exceeded.\\nCall log:\\n  - waiting for locator(\\\"input[name=\\\\\\\"username\\\\\\\"]\\\") to be visible\"\n    }\n  ],\n  \"last_stdout\": \"Starting tests...\\nTest execution failed: Locator.wait_for: Timeout 15000ms exceeded.\\nCall log:\\n  - waiting for locator(\\\"input[name=\\\\\\\"username\\\\\\\"]\\\") to be visible\\n\\n\",\n  \"last_stderr\": \"Traceback (most recent call last):\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 83, in <module>\\n    test_login_failure(page)\\n    ~~~~~~~~~~~~~~~~~~^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\OneDrive - ascendion\\\\Desktop\\\\LangGraph_QE_E2E_Project\\\\outputs\\\\test_scripts\\\\test_generated_suite.py\\\", line 55, in test_login_failure\\n    username_input.wait_for(state='visible', timeout=15000)\\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\sync_api\\\\_generated.py\\\", line 20048, in wait_for\\n    self._sync(\\n    ~~~~~~~~~~^\\n        self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)\\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_sync_base.py\\\", line 115, in _sync\\n    return task.result()\\n           ~~~~~~~~~~~^^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_locator.py\\\", line 741, in wait_for\\n    await self._frame.wait_for_selector(\\n        self._selector, strict=True, timeout=timeout, state=state\\n    )\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_frame.py\\\", line 372, in wait_for_selector\\n    await self._channel.send(\\n        \\\"waitForSelector\\\", self._timeout, locals_to_params(locals())\\n    )\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 69, in send\\n    return await self._connection.wrap_api_call(\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n    ...<3 lines>...\\n    )\\n    ^\\n  File \\\"C:\\\\Users\\\\mukul.narayana\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\\\\playwright\\\\_impl\\\\_connection.py\\\", line 559, in wrap_api_call\\n    raise rewrite_error(error, f\\\"{parsed_st['apiName']}: {error}\\\") from None\\nplaywright._impl._errors.TimeoutError: Locator.wait_for: Timeout 15000ms exceeded.\\nCall log:\\n  - waiting for locator(\\\"input[name=\\\\\\\"username\\\\\\\"]\\\") to be visible\\n\\n\",\n  \"code\": \"import os\\nimport time\\nfrom playwright.sync_api import sync_playwright, expect\\n\\n# Configuration\\nBASE_URL = \\\"https://opensource-demo.orangehrmlive.com/web/index.php/auth/login\\\"\\nUSERNAME = \\\"Admin\\\"\\nPASSWORD = \\\"admin123\\\"\\n\\ndef navigate_to(page, url, retries=3):\\n    \\\"\\\"\\\"Resilient navigation with retry logic.\\\"\\\"\\\"\\n    for i in range(retries):\\n        try:\\n            page.goto(url, wait_until='domcontentloaded', timeout=45000)\\n            # Wait for the login form to be present\\n            page.wait_for_selector('input[name=\\\"username\\\"]', timeout=10000)\\n            return\\n        except Exception:\\n            if i == retries - 1:\\n                raise\\n            time.sleep(5)\\n\\ndef test_login_flow(page):\\n    \\\"\\\"\\\"Verify successful login.\\\"\\\"\\\"\\n    navigate_to(page, BASE_URL)\\n    \\n    # Perform Login\\n    page.locator('input[name=\\\"username\\\"]').fill(USERNAME)\\n    page.locator('input[name=\\\"password\\\"]').fill(PASSWORD)\\n    page.get_by_role('button', name='Login').click()\\n    \\n    # Verify Dashboard\\n    dashboard_header = page.locator('h6.oxd-topbar-header-breadcrumb-module')\\n    expect(dashboard_header).to_have_text('Dashboard', timeout=20000)\\n\\ndef test_dashboard_widgets(page):\\n    \\\"\\\"\\\"Verify dashboard widgets exist.\\\"\\\"\\\"\\n    # Ensure we are on dashboard\\n    if \\\"dashboard\\\" not in page.url:\\n        test_login_flow(page)\\n    \\n    widgets = ['Time at Work', 'My Actions', 'Quick Launch']\\n    \\n    for widget_name in widgets:\\n        widget = page.locator('.orangehrm-dashboard-widget').filter(has=page.get_by_text(widget_name, exact=True)).first\\n        expect(widget).to_be_visible(timeout=15000)\\n\\ndef test_login_failure(page):\\n    \\\"\\\"\\\"Verify error message on invalid credentials.\\\"\\\"\\\"\\n    # Navigate to login page explicitly\\n    page.goto(\\\"https://opensource-demo.orangehrmlive.com/web/index.php/auth/login\\\")\\n    \\n    # Wait for inputs to be ready\\n    username_input = page.locator('input[name=\\\"username\\\"]')\\n    username_input.wait_for(state='visible', timeout=15000)\\n    \\n    username_input.fill(\\\"InvalidUser\\\")\\n    page.locator('input[name=\\\"password\\\"]').fill(\\\"WrongPassword\\\")\\n    page.get_by_role('button', name='Login').click()\\n    \\n    error_msg = page.locator('.oxd-alert-content-text')\\n    expect(error_msg).to_be_visible(timeout=10000)\\n    expect(error_msg).to_contain_text(\\\"Invalid credentials\\\")\\n\\nif __name__ == \\\"__main__\\\":\\n    with sync_playwright() as p:\\n        videos_dir = os.path.join(os.getcwd(), \\\"outputs\\\", \\\"reports\\\", \\\"videos\\\")\\n        os.makedirs(videos_dir, exist_ok=True)\\n\\n        browser = p.chromium.launch(headless=True, args=['--ignore-certificate-errors', '--no-sandbox'])\\n        context = browser.new_context(\\n            ignore_https_errors=True,\\n            record_video_dir=videos_dir,\\n            record_video_size={\\\"width\\\": 1280, \\\"height\\\": 720}\\n        )\\n        page = context.new_page()\\n        page.set_default_timeout(20000)\\n\\n        try:\\n            print(\\\"Starting tests...\\\")\\n            test_login_flow(page)\\n            test_dashboard_widgets(page)\\n            test_login_failure(page)\\n            print(\\\"All tests passed successfully.\\\")\\n        except Exception as e:\\n            print(f\\\"Test execution failed: {e}\\\")\\n            raise\\n        finally:\\n            context.close()\\n            browser.close()\"\n}"
+    "playwright_code": "{\n  \"status\": \"ALL_PASSED\",\n  \"total_tests\": 5,\n  \"passed_count\": 5,\n  \"failed_count\": 0,\n  \"healed_count\": 5,\n  \"tests_dir\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\final_testscripts\",\n  \"generated_scripts\": [\n    {\n      \"scenario_id\": \"TS-01\",\n      \"summary\": \"[AUT-1] Verify successful login with valid credentials and redirection to the dashboard\",\n      \"file\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\final_testscripts\\\\test_ts_01_verify_successful_login_with_valid_crede.py\",\n      \"status\": \"PASSED\",\n      \"rounds\": 2,\n      \"healed\": true,\n      \"stdout\": \"[PASSED] Test completed successfully.\\n\",\n      \"stderr\": \"\"\n    },\n    {\n      \"scenario_id\": \"TS-02\",\n      \"summary\": \"[AUT-1] Verify login fails with invalid username and valid password\",\n      \"file\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\final_testscripts\\\\test_ts_02_verify_login_fails_with_invalid_username.py\",\n      \"status\": \"PASSED\",\n      \"rounds\": 2,\n      \"healed\": true,\n      \"stdout\": \"[PASSED] Test completed successfully.\\n\",\n      \"stderr\": \"\"\n    },\n    {\n      \"scenario_id\": \"TS-03\",\n      \"summary\": \"[AUT-1] Verify login fails with valid username and invalid password\",\n      \"file\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\final_testscripts\\\\test_ts_03_verify_login_fails_with_valid_username_a.py\",\n      \"status\": \"PASSED\",\n      \"rounds\": 2,\n      \"healed\": true,\n      \"stdout\": \"[PASSED] Test completed successfully.\\n\",\n      \"stderr\": \"\"\n    },\n    {\n      \"scenario_id\": \"TS-04\",\n      \"summary\": \"[AUT-1] Verify login fails when both username and password fields are left blank\",\n      \"file\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\final_testscripts\\\\test_ts_04_verify_login_fails_when_both_username_an.py\",\n      \"status\": \"PASSED\",\n      \"rounds\": 2,\n      \"healed\": true,\n      \"stdout\": \"[PASSED] Test completed successfully.\\n\",\n      \"stderr\": \"\"\n    },\n    {\n      \"scenario_id\": \"TS-05\",\n      \"summary\": \"[AUT-1] Verify dashboard displays the correct version number in the footer\",\n      \"file\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\final_testscripts\\\\test_ts_05_verify_dashboard_displays_the_correct_ve.py\",\n      \"status\": \"PASSED\",\n      \"rounds\": 3,\n      \"healed\": true,\n      \"stdout\": \"[PASSED] Test completed successfully.\\n\",\n      \"stderr\": \"\"\n    }\n  ],\n  \"report_file\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\reports\\\\playwright_report.html\",\n  \"pytest_report_file\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\reports\\\\pytest_report.html\",\n  \"videos_dir\": \"C:\\\\Users\\\\kiruthika.ganesan\\\\Desktop\\\\vs code\\\\llm learn\\\\Project-1\\\\outputs\\\\reports\\\\videos\"\n}",
+    "generated_test_scripts": [
+        {
+            "scenario_id": "TS-01",
+            "summary": "[AUT-1] Verify successful login with valid credentials and redirection to the dashboard",
+            "file": "C:\\Users\\kiruthika.ganesan\\Desktop\\vs code\\llm learn\\Project-1\\outputs\\final_testscripts\\test_ts_01_verify_successful_login_with_valid_crede.py",
+            "status": "PASSED",
+            "rounds": 2,
+            "healed": true,
+            "stdout": "[PASSED] Test completed successfully.\n",
+            "stderr": ""
+        },
+        {
+            "scenario_id": "TS-02",
+            "summary": "[AUT-1] Verify login fails with invalid username and valid password",
+            "file": "C:\\Users\\kiruthika.ganesan\\Desktop\\vs code\\llm learn\\Project-1\\outputs\\final_testscripts\\test_ts_02_verify_login_fails_with_invalid_username.py",
+            "status": "PASSED",
+            "rounds": 2,
+            "healed": true,
+            "stdout": "[PASSED] Test completed successfully.\n",
+            "stderr": ""
+        },
+        {
+            "scenario_id": "TS-03",
+            "summary": "[AUT-1] Verify login fails with valid username and invalid password",
+            "file": "C:\\Users\\kiruthika.ganesan\\Desktop\\vs code\\llm learn\\Project-1\\outputs\\final_testscripts\\test_ts_03_verify_login_fails_with_valid_username_a.py",
+            "status": "PASSED",
+            "rounds": 2,
+            "healed": true,
+            "stdout": "[PASSED] Test completed successfully.\n",
+            "stderr": ""
+        },
+        {
+            "scenario_id": "TS-04",
+            "summary": "[AUT-1] Verify login fails when both username and password fields are left blank",
+            "file": "C:\\Users\\kiruthika.ganesan\\Desktop\\vs code\\llm learn\\Project-1\\outputs\\final_testscripts\\test_ts_04_verify_login_fails_when_both_username_an.py",
+            "status": "PASSED",
+            "rounds": 2,
+            "healed": true,
+            "stdout": "[PASSED] Test completed successfully.\n",
+            "stderr": ""
+        },
+        {
+            "scenario_id": "TS-05",
+            "summary": "[AUT-1] Verify dashboard displays the correct version number in the footer",
+            "file": "C:\\Users\\kiruthika.ganesan\\Desktop\\vs code\\llm learn\\Project-1\\outputs\\final_testscripts\\test_ts_05_verify_dashboard_displays_the_correct_ve.py",
+            "status": "PASSED",
+            "rounds": 3,
+            "healed": true,
+            "stdout": "[PASSED] Test completed successfully.\n",
+            "stderr": ""
+        }
+    ]
 }

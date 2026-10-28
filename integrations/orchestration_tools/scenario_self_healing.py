@@ -5,15 +5,16 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 
 # Import our local agents
-from src.agents.testcases_generator_agent import testcases_generator_agent
-from src.agents.testcase_reviewer_agent import testcase_reviewer_agent
-from src.tools.rag_tools import orangehrmDomain_kb_tool
+from src.agents.scenario_generator_agent import scenario_generator_agent
+from src.agents.scenario_reviewer_agent import scenario_reviewer_agent
+from integrations.rag.rag_tools import orangehrmDomain_kb_tool
 
 logger = logging.getLogger(__name__)
 
 def _strip_fences(text):
     if not text:
         return text
+    # Very basic fence stripper, you can expand if needed
     text = text.strip()
     if text.startswith("```json"):
         text = text[7:]
@@ -23,22 +24,28 @@ def _strip_fences(text):
         text = text[:-3]
     return text.strip()
 
-class TestCasesSelfHealingGeneratorSchema(BaseModel):
+_NL_MARKER = "[[NL]]"
+
+def _flatten_multiline(text):
+    if not text:
+        return text
+    return text.replace("\r\n", "\n").replace("\n", _NL_MARKER)
+
+class ScenarioSelfHealingGeneratorSchema(BaseModel):
     storysummary: str = Field(..., description="Jira story summary")
     storydescription: str = Field("", description="Jira story description")
-    scenarios: str = Field("", description="JSON string of generated test scenarios")
     epiccontext: str = Field("", description="Epic summary + description")
     preconditions: str = Field("", description="Extracted preconditions")
     threshold: int = Field(85, description="Minimum reviewer confidence (0-100) required to stop the loop")
     max_regen: int = Field(3, description="Circuit-breaker: maximum generate-review rounds")
 
-class TestCasesSelfHealingGeneratorToolV1(BaseTool):
-    name: str = "TestCasesSelfHealingGeneratorToolV1"
+class ScenarioSelfHealingGeneratorToolV1(BaseTool):
+    name: str = "ScenarioSelfHealingGeneratorToolV1"
     description: str = (
-        "Self-healing test cases generation for a Jira story and its scenarios. Runs a Generator and an "
+        "Self-healing scenario-list generation for a Jira story. Runs a Generator and an "
         "independent Reviewer agent in a loop until confidence score is >= threshold."
     )
-    args_schema: Type[BaseModel] = TestCasesSelfHealingGeneratorSchema
+    args_schema: Type[BaseModel] = ScenarioSelfHealingGeneratorSchema
 
     def _run(self, **kwargs) -> str:
         a = kwargs.get("kwargs", kwargs) or kwargs
@@ -47,7 +54,6 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
             return json.dumps({"status": "error", "error": "storysummary is required"})
 
         story_description = a.get("storydescription") or ""
-        scenarios = a.get("scenarios") or ""
         epic_context = a.get("epiccontext") or ""
         preconditions = a.get("preconditions") or ""
         threshold = int(a.get("threshold", 85))
@@ -55,7 +61,11 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
         
         # 0. Fetch KB context
         try:
+            print("\n[DEBUG] TOOL IS SEARCHING KNOWLEDGE BASE DIRECTLY...")
             kb_context = orangehrmDomain_kb_tool.invoke({"query": story_summary})
+            print(f"\n=================== RAG CONTEXT RETRIEVED ===================")
+            print(kb_context)
+            print(f"=============================================================\n")
         except Exception as e:
             logger.warning(f"Failed to fetch KB context: {e}")
             kb_context = "No KB context available."
@@ -65,11 +75,10 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
         trajectory = []
 
         for round_num in range(1, max_regen + 1):
-            # 1. GENERATE TESTCASES
+            # 1. GENERATE SCENARIOS (using local agent)
             gen_payload_str = (
                 f"Summary: {story_summary}\n"
                 f"Description: {story_description}\n"
-                f"Scenarios:\n{scenarios}\n"
                 f"Epic: {epic_context}\n"
                 f"Preconditions: {preconditions}\n"
                 f"Knowledge Base Context:\n{kb_context}\n"
@@ -78,20 +87,25 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
                 gen_payload_str += f"\nReviewer Feedback from last round: {feedback}. Please fix these issues exactly."
 
             try:
-                gen_result = testcases_generator_agent.invoke({"messages": [("user", gen_payload_str)]})
+                # Invoke generator agent
+                # Note: scenario_generator_agent is now a create_react_agent, so it needs messages
+                gen_result = scenario_generator_agent.invoke({"messages": [("user", gen_payload_str)]})
                 
+                # We need it as a JSON string to pass it around
                 messages = gen_result.get("messages", [])
                 if messages:
                     last_msg = messages[-1]
+                    # Check if structured output is returned via tool_calls
                     if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
-                        testcases_json = json.dumps(last_msg.tool_calls[0].get("args", {}))
+                        # Extract the arguments from the first tool call
+                        scenarios_json = json.dumps(last_msg.tool_calls[0].get("args", {}))
                     else:
-                        raw_testcases = last_msg.content
-                        if isinstance(raw_testcases, str):
-                            testcases_json = raw_testcases
-                        elif isinstance(raw_testcases, list):
+                        raw_scenarios = last_msg.content
+                        if isinstance(raw_scenarios, str):
+                            scenarios_json = raw_scenarios
+                        elif isinstance(raw_scenarios, list):
                             parts = []
-                            for item in raw_testcases:
+                            for item in raw_scenarios:
                                 if isinstance(item, str):
                                     parts.append(item)
                                 elif isinstance(item, dict) and "text" in item:
@@ -100,22 +114,23 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
                                     parts.append(json.dumps(item))
                                 else:
                                     parts.append(str(item))
-                            testcases_json = "\n".join(parts)
-                        elif isinstance(raw_testcases, dict):
-                            testcases_json = json.dumps(raw_testcases)
+                            scenarios_json = "\n".join(parts)
+                        elif isinstance(raw_scenarios, dict):
+                            scenarios_json = json.dumps(raw_scenarios)
                         else:
-                            testcases_json = str(raw_testcases)
+                            scenarios_json = str(raw_scenarios)
                 else:
-                    testcases_json = ""
+                    scenarios_json = ""
             except Exception as e:
                 trajectory.append({"round": round_num, "error": f"generator failed: {str(e)}"})
                 break
 
-            # 2. REVIEW TESTCASES
+            # 2. REVIEW SCENARIOS (using local agent)
             try:
-                review_result = testcase_reviewer_agent.invoke({
+                # The reviewer agent returns a Pydantic 'ReviewResponse' object
+                review_result = scenario_reviewer_agent.invoke({
                     "story_details": gen_payload_str,
-                    "testcases": testcases_json
+                    "scenarios": scenarios_json
                 })
                 
                 confidence = review_result.confidence
@@ -131,7 +146,7 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
                 break
 
             if best is None or confidence > best["confidence"]:
-                best = {"confidence": confidence, "testcases": testcases_json, "review": review_dict, "round": round_num}
+                best = {"confidence": confidence, "scenarios": scenarios_json, "review": review_dict, "round": round_num}
 
             if confidence >= threshold:
                 decision = "STOP threshold-met"
@@ -145,17 +160,19 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
             if decision.startswith("STOP"):
                 break
             
+            # Feed this back into the next loop
             feedback = curr_feedback
 
         if best is None:
             return json.dumps({"status": "error", "error": "no successful round", "trajectory": trajectory})
 
         try:
-            parsed_testcases = json.loads(_strip_fences(best["testcases"]))
-            if isinstance(parsed_testcases, dict) and "testcases" in parsed_testcases:
-                parsed_testcases = parsed_testcases["testcases"]
+            parsed_scenarios = json.loads(_strip_fences(best["scenarios"]))
+            # If the response wrapper 'scenarios' is present, we extract it.
+            if isinstance(parsed_scenarios, dict) and "scenarios" in parsed_scenarios:
+                parsed_scenarios = parsed_scenarios["scenarios"]
         except Exception:
-            parsed_testcases = best["testcases"]
+            parsed_scenarios = best["scenarios"]
 
         return json.dumps({
             "status": "ok",
@@ -163,7 +180,7 @@ class TestCasesSelfHealingGeneratorToolV1(BaseTool):
             "threshold": threshold,
             "rounds": best["round"],
             "healingtriggered": best["round"] > 1,
-            "testcases": parsed_testcases,
+            "scenarios": parsed_scenarios,
             "reviewerfeedback": best["review"]["feedback"],
             "trajectory": trajectory
         })

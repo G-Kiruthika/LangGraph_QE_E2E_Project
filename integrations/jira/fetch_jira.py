@@ -48,3 +48,4 @@ def get_issue_details(issue_key: str) -> dict:
         return {"error": f"HTTP error occurred: {http_err}"}
     except Exception as err:
         return {"error": f"An unexpected error occurred: {str(err)}"}
+

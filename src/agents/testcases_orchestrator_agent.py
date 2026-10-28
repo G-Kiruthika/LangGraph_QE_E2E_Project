@@ -1,5 +1,5 @@
 from src.core.llm import llm
-from src.tools.testcases_selfHealing_tool import TestCasesSelfHealingGeneratorToolV1
+from integrations.orchestration_tools.testcases_self_healing import TestCasesSelfHealingGeneratorToolV1
 from langgraph.prebuilt import create_react_agent
 
 testcases_self_healing_tool = TestCasesSelfHealingGeneratorToolV1()

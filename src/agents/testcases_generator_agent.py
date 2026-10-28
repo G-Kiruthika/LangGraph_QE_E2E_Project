@@ -1,5 +1,4 @@
 from src.core.llm import llm
-from src.models.schemas import TestCaseResponse
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.prebuilt import create_react_agent
 
@@ -13,11 +12,13 @@ Instructions:
 5. Include both "**Preconditions:**" and "**Postconditions:**" directly inside the `description` string itself.
 6. The `test_type` must be one of: "Functional", "Non-functional", "Negative", "Integration".
 7. Self-Healing Loop: If reviewer feedback is provided, you MUST address the feedback and adjust your generated testcases accordingly.
+8. Return ONLY the raw JSON inside ```json ``` code block.
 
 Expected JSON Array format for testcases:
+```json
 [
   {
-    "summary": "[QE-378] Verify successful login",
+    "summary": "[AUT-1] Verify successful login",
     "description": "**Objective:** Ensure user can login.\\n\\n**Preconditions:**\\nUser is registered.\\n\\n**Postconditions:**\\nUser session is created.",
     "test_type": "Functional",
     "scenario_id": "TS-01",
@@ -30,11 +31,11 @@ Expected JSON Array format for testcases:
     ]
   }
 ]
+```
 """
 
 testcases_generator_agent = create_react_agent(
     model=llm,
     tools=[],
-    prompt=system_prompt,
-    response_format=TestCaseResponse
+    prompt=system_prompt
 )
