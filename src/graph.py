@@ -1,7 +1,7 @@
 from src.nodes.scenario_node import generate_test_scenarios
 from src.nodes.jira_node import fetch_jira_story, create_subtask
 from src.nodes.testcases_node import generate_test_cases
-from src.nodes.codegen_node import generate_and_heal_test_scripts
+from src.nodes.testScriptGen_node import generate_and_heal_test_scripts
 from langgraph.graph import StateGraph, START, END
 from src.core.state import GraphState
 
